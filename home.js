@@ -74,9 +74,17 @@ class Room {
   }
 
   scoreModeChange(proposedMode) {
-    //TODO: return extremely high values if we're outside our range
+    // Check for danger first
+    if (this.temp.current < this.temp.min) {
+      if (proposedMode == "heat")
+        return A_LOT * (this.temp.min - this.temp.current);
+    }
+    if (this.temp.current > this.temp.max) {
+      if (proposedMode == "cool")
+        return A_LOT * (this.temp.current - this.temp.max);
+    }
     // desiredChange will be negative if we'd like to cool the room
-    let desiredChange = this.temp.ideal - this.temp.current;
+    const desiredChange = this.temp.ideal - this.temp.current;
     if (proposedMode == "cool") {
       if (desiredChange < 0) return -desiredChange;
       return -A_LOT;
