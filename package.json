@@ -5,7 +5,7 @@
   "main": "broadlink.js",
   "types": "index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test/test-optimization.js"
   },
   "repository": {
     "type": "git",
@@ -24,9 +24,13 @@
   },
   "homepage": "https://github.com/momodalo/broadlinkjs#readme",
   "dependencies": {
-    "@types/node": "^7.0.5"
+    "@types/node": "^7.0.5",
+    "huejay": "^1.9.0"
   },
   "directories": {
     "test": "test"
+  },
+  "devDependencies": {
+    "tape": "^4.11.0"
   }
 }
