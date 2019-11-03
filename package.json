@@ -17,6 +17,10 @@
     "remote",
     "control"
   ],
+  "prettier": {
+    "semi": false,
+    "printWidth": 100
+  },
   "author": "David Tao",
   "license": "MIT",
   "bugs": {
