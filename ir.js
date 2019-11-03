@@ -8,9 +8,13 @@ exports.setSpecialCode = function(name, hex) {
   codes[name] = hex
 }
 exports.getBuffer = function(...names) {
-  var x = codes
-  for (var name of names) x = x[name]
-  return Buffer.from(x, "hex")
+  try {
+    var x = codes
+    for (var name of names) x = x[name]
+    return Buffer.from(x, "hex")
+  } catch (e) {
+    throw new Error("could not find IRR codes for " + names)
+  }
 }
 exports.printAll = function() {
   console.log(codes)

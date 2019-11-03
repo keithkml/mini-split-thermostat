@@ -100,10 +100,7 @@ class Home {
     for (let i = 0; i < this.rooms.length; i++) {
       let room = this.rooms[i]
       let c = newConfiguration[i]
-      let data =
-        c == "off" ? ir.getBuffer("off") : ir.getBuffer(c, room.fanSetting, room.temp.ideal)
-      room.blaster.sendData(data)
-      console.log(`Configuring ${room.name} for ${c} ${room.fanSetting} -> ${room.temp.ideal} F`)
+      room.configure(c)
     }
     this.currentConfiguration = newConfiguration
     return true
@@ -118,6 +115,8 @@ class Room {
   }
 
   scoreModeChange(proposedMode) {
+    // We prefer "off" if we're not valid, even though it doesn't really matter. It helps the optimizer make better decisions.
+    if (!this.isValid()) return proposedMode == "off" ? 0 : -A_LOT
     // Check for danger first
     if (this.temp.current < this.temp.min) {
       if (proposedMode == "heat") return A_LOT * (this.temp.min - this.temp.current)
@@ -141,6 +140,22 @@ class Room {
     // should never happen
     console.error("proposedMode was ", proposedMode)
     return 0
+  }
+
+  isValid() {
+    return !isNaN(this.temp.current) && typeof this.temp.current == "number"
+  }
+
+  configure(mode) {
+    if (!this.isValid) {
+      console.warn("Skipping configuration of " + this.name + " because we're not valid")
+      return false
+    }
+    let data =
+      mode == "off" ? ir.getBuffer("off") : ir.getBuffer(mode, this.fanSetting, this.temp.ideal)
+    this.blaster.sendData(data)
+    console.log(`Configuring ${this.name} for ${mode} ${this.fanSetting} -> ${this.temp.ideal} F`)
+    return true
   }
 }
 
