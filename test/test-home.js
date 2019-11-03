@@ -4,7 +4,7 @@ const { Home, Room } = require("../home");
 console.log(Home);
 console.log(Room);
 
-//TODO: test error  cases
+// TODO: test weird numbers  (0, nan)
 // TODO: test really minor differences  (75.1 vs 75.0)
 
 test("should do the obvious thing with a single room", function(t) {

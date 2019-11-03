@@ -13,9 +13,10 @@ let mousepad = new home.Home(
     blasterMacAddress: "9d278901a8c0",
     temp: {
       ideal: 75,
-      min: 72,
-      max: 77
-    }
+      min: 68,
+      max: 78
+    },
+    fanSetting: "auto"
   })
   // new Room({
   //     name: "Rec Room",
@@ -52,11 +53,15 @@ temps.startPollingSensors(HUE_USERNAME, sensor => {
   for (let room of mousepad.rooms) {
     if (sensor.uniqueId == room.sensorId) {
       room.sensor = sensor;
-      room.temp.current =
-        (sensor.state.attributes.attributes.temperature * 9) / 5 + 32;
+      let temp =
+        ((sensor.state.attributes.attributes.temperature / 100) * 9) / 5 + 32;
+      if (room.temp.current != temp) {
+        console.log(room.name + " is now " + temp + " F");
+        room.temp.current = temp;
+      }
     }
   }
 });
 
-setInterval(() => mousepad.computeOptimalState(), 60 * 1000);
-setInterval(() => mousepad.applyOptimalState(), 120 * 1000);
+setInterval(() => mousepad.computeOptimalState(), 5 * 1000);
+setInterval(() => mousepad.applyOptimalState(), 30 * 1000);

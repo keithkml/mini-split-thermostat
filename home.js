@@ -1,3 +1,5 @@
+const ir = require("./ir");
+
 function permuteConfigurations(mode, numberOfRooms) {
   if (numberOfRooms == 1) return [["off"], [mode]];
   const result = [];
@@ -8,10 +10,25 @@ function permuteConfigurations(mode, numberOfRooms) {
   return result;
 }
 
-const notAllOff = configuration =>
-  configuration.filter(c => c != "off").length > 0;
+const notAllOff = configuration => configuration.some(c => c != "off");
 
 const A_LOT = 10000;
+
+function arraysEqual(a, b) {
+  if (a === b) return true;
+  if (a == null || b == null) return false;
+  if (a.length != b.length) return false;
+
+  // If you don't care about the order of the elements inside
+  // the array, you should sort both arrays here.
+  // Please note that calling sort on an array will modify that array.
+  // you might want to clone your array first.
+
+  for (var i = 0; i < a.length; ++i) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+}
 
 class Home {
   constructor(...rooms) {
@@ -21,6 +38,8 @@ class Home {
       ...permuteConfigurations("heat", rooms.length)
     ].filter(notAllOff);
     this.allConfigurations.push(this.rooms.map(r => "off"));
+    this.optimalConfigurations = null;
+    this.currentConfiguration = null;
     console.log("configs", this.allConfigurations);
   }
 
@@ -58,11 +77,44 @@ class Home {
       if (aStr == bStr) return 0;
       return aStr > bStr ? 1 : -1;
     });
-    console.log(annotatedConfigurations);
+    // console.log(annotatedConfigurations);
     let bestScore = annotatedConfigurations[0].score;
-    return annotatedConfigurations
+    return (this.optimalConfigurations = annotatedConfigurations
       .filter(a => a.score == bestScore)
-      .map(a => a.configuration);
+      .map(a => a.configuration));
+  }
+
+  applyOptimalState() {
+    if (!this.optimalConfigurations || !this.optimalConfigurations.length) {
+      console.error("no optimal configurations");
+      return false;
+    }
+    if (
+      this.currentConfiguration &&
+      this.optimalConfigurations.some(c =>
+        arraysEqual(c, this.currentConfiguration)
+      )
+    ) {
+      console.log(
+        "we're already in an optimal configuration; not changing anything"
+      );
+      return false;
+    }
+    const newConfiguration = this.optimalConfigurations[0];
+    for (let i = 0; i < this.rooms.length; i++) {
+      let room = this.rooms[i];
+      let c = newConfiguration[i];
+      let data =
+        c == "off"
+          ? ir.getBuffer("off")
+          : ir.getBuffer(c, room.fanSetting, room.temp.ideal);
+      room.blaster.sendData(data);
+      console.log(
+        `Configuring ${room.name} for ${c} ${room.fanSetting} -> ${room.temp.ideal} F`
+      );
+    }
+    this.currentConfiguration = newConfiguration;
+    return true;
   }
 }
 
