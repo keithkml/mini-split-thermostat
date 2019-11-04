@@ -16,6 +16,3 @@ exports.getBuffer = function(...names) {
     throw new Error("could not find IRR codes for " + names)
   }
 }
-exports.printAll = function() {
-  console.log(codes)
-}

@@ -1,4 +1,5 @@
 const ir = require("./ir")
+const { logger } = require("./logging")
 
 function permuteConfigurations(mode, numberOfRooms) {
   if (numberOfRooms == 1) return [["off"], [mode]]
@@ -40,14 +41,12 @@ class Home {
     this.allConfigurations.push(this.rooms.map(r => "off"))
     this.optimalConfigurations = null
     this.currentConfiguration = null
-    console.log("configs", this.allConfigurations)
   }
 
   computeOptimalState() {
     let annotatedConfigurations = this.allConfigurations.map(configuration => ({
       configuration
     }))
-    console.log(annotatedConfigurations)
     for (let annotated of annotatedConfigurations) {
       let configuration = annotated.configuration
       let score = []
@@ -58,7 +57,7 @@ class Home {
         score.push(s)
       }
       let total = score.reduce((a, b) => a + b, 0)
-      console.log(total + " (" + score.join("+") + ") <-- " + configuration)
+      logger.info("score: " + total + " (" + score.join("+") + ") <-- " + configuration)
       annotated.score = total
     }
     annotatedConfigurations.sort((a, b) => {
@@ -77,7 +76,6 @@ class Home {
       if (aStr == bStr) return 0
       return aStr > bStr ? 1 : -1
     })
-    // console.log(annotatedConfigurations);
     let bestScore = annotatedConfigurations[0].score
     return (this.optimalConfigurations = annotatedConfigurations
       .filter(a => a.score == bestScore)
@@ -86,14 +84,14 @@ class Home {
 
   applyOptimalState() {
     if (!this.optimalConfigurations || !this.optimalConfigurations.length) {
-      console.error("no optimal configurations")
+      logger.error("no optimal configurations")
       return false
     }
     if (
       this.currentConfiguration &&
       this.optimalConfigurations.some(c => arraysEqual(c, this.currentConfiguration))
     ) {
-      console.log("we're already in an optimal configuration; not changing anything")
+      logger.info("we're already in an optimal configuration; not changing anything")
       return false
     }
     const newConfiguration = this.optimalConfigurations[0]
@@ -138,7 +136,7 @@ class Room {
       // return negative score for status quo unless desiredChange is zero
       return -Math.abs(desiredChange)
     // should never happen
-    console.error("proposedMode was ", proposedMode)
+    logger.error("proposedMode was ", proposedMode)
     return 0
   }
 
@@ -148,13 +146,13 @@ class Room {
 
   configure(mode) {
     if (!this.isValid) {
-      console.warn("Skipping configuration of " + this.name + " because we're not valid")
+      logger.warn("Skipping configuration of " + this.name + " because we're not valid")
       return false
     }
     let data =
       mode == "off" ? ir.getBuffer("off") : ir.getBuffer(mode, this.fanSetting, this.temp.ideal)
     this.blaster.sendData(data)
-    console.log(`Configuring ${this.name} for ${mode} ${this.fanSetting} -> ${this.temp.ideal} F`)
+    logger.info(`Configuring ${this.name} for ${mode} ${this.fanSetting} -> ${this.temp.ideal} F`)
     return true
   }
 }

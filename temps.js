@@ -1,4 +1,5 @@
 let huejay = require("huejay")
+const { logger } = require("./logging")
 
 function pollSensors(client, callback) {
   client.sensors
@@ -11,7 +12,7 @@ function pollSensors(client, callback) {
       }
     })
     .catch(error => {
-      console.log(error.stack)
+      logger.error(error.stack)
       exitHorribly()
     })
 }
@@ -21,7 +22,7 @@ exports.startPollingSensors = function(username, callback) {
     .discover()
     .then(bridges => {
       let bridge = bridges[0]
-      console.log("Using Hue bridge " + bridge.ip)
+      logger.info("Using Hue bridge " + bridge.ip)
       client = new huejay.Client({
         host: bridge.ip,
         username
@@ -29,7 +30,7 @@ exports.startPollingSensors = function(username, callback) {
       setInterval(() => pollSensors(client, callback), 10 * 1000)
     })
     .catch(error => {
-      console.log(`An error occurred: ${error.message}`)
+      logger.error(`An error occurred: ${error.message}`)
       exitHorribly()
     })
 }

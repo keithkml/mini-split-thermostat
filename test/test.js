@@ -14,16 +14,16 @@ var filenames = ["dummy.txt", "lightoff", "off"]
 //         }
 //     }
 // }
-console.log(filenames)
+logger.info(filenames)
 
 function useFilename() {
   var toReturn = filenames.shift()
-  console.log("next: " + filenames[0])
+  logger.info("next: " + filenames[0])
   return toReturn
 }
 
 b.on("deviceReady", dev => {
-  console.log("device ready " + dev.getType())
+  logger.info("device ready " + dev.getType())
   global.dev = dev
   dev.enterLearning()
   useFilename()
@@ -33,16 +33,16 @@ b.on("deviceReady", dev => {
 
   dev.on("rawData", data => {
     if (data.equals(lastData)) {
-      console.log("data didn't change")
+      logger.info("data didn't change")
       return
     }
     var nextFilename = useFilename()
     lastData = data
     fs.writeFile(nextFilename, data, function(err) {
       if (err) {
-        return console.log(err)
+        return logger.info(err)
       }
-      console.log("    (saved " + nextFilename)
+      logger.info("    (saved " + nextFilename)
     })
 
     dev.enterLearning()

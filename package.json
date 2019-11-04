@@ -29,7 +29,10 @@
   "homepage": "https://github.com/momodalo/broadlinkjs#readme",
   "dependencies": {
     "@types/node": "^7.0.5",
-    "huejay": "^1.9.0"
+    "aws-sdk": "^2.562.0",
+    "huejay": "^1.9.0",
+    "winston": "^3.2.1",
+    "winston-cloudwatch": "^2.2.0"
   },
   "directories": {
     "test": "test"
