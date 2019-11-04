@@ -6,6 +6,20 @@ let home = require("./home")
 
 const HUE_USERNAME = process.env.HUE_USERNAME
 
+/* TODO ideas:
+ * Don't thrash; allow a margin of error +/- 1 degree
+ * Minimize changes, especially at night, to reduce beeping. Need a change scoring function
+ * Allow changing desired temperature by time of day
+ * Turn off the status LED after changing
+ * Reconfigure everything every hour or two in case someone changed it
+ * Log to ELK or some logging service
+ * Text owner when there are incompatible changes
+ * Be more resilient to errors
+ * Reset connection to Broadlink and Hue every few hours
+ * Use getSensorById instead of enumerating every time
+ * Publish the change to index.js and then make this *use* broadlinkjs instead of forking it
+ */
+
 let mousepad = new home.Home(
   new home.Room({
     name: "Living Room",
