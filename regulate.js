@@ -59,5 +59,5 @@ temps.startPollingSensors(HUE_USERNAME, sensor => {
   }
 })
 
-setInterval(() => mousepad.computeOptimalState(), 5 * 1000)
-setInterval(() => mousepad.applyOptimalState(), 30 * 1000)
+setInterval(() => mousepad.computeOptimalState(), 60 * 1000)
+setInterval(() => mousepad.applyOptimalState(), 5 * 60 * 1000)
