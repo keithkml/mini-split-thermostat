@@ -18,6 +18,7 @@ const HUE_USERNAME = process.env.HUE_USERNAME
  * Reset connection to Broadlink and Hue every few hours
  * Use getSensorById instead of enumerating every time
  * Publish the change to index.js and then make this *use* broadlinkjs instead of forking it
+ * Turn all devices off before switching from heat to cool or vice versa
  */
 
 let mousepad = new home.Home(
