@@ -1,4 +1,5 @@
 const winston = require("winston")
+const testing = require("./testing")
 var AWS = require("aws-sdk")
 const WinstonCloudWatch = require("winston-cloudwatch")
 
@@ -10,11 +11,16 @@ AWS.config.getCredentials(function(err) {
     console.log("Secret access key:", AWS.config.credentials.secretAccessKey)
   }
 })
-const logger = winston.createLogger({
-  level: "info",
-  format: winston.format.json(),
-  defaultMeta: { service: "user-service" },
-  transports: [
+let transports
+if (testing.isUnitTest()) {
+  console.log("WE'RE IN A UNIT TEST; NOT LOGGING TO AWS")
+  transports = [
+    new winston.transports.Console({
+      format: winston.format.simple()
+    })
+  ]
+} else {
+  transports = [
     //
     // - Write to all logs with level `info` and below to `combined.log`
     // - Write all logs error (and below) to `error.log`.
@@ -30,6 +36,12 @@ const logger = winston.createLogger({
       awsRegion: "us-east-2"
     })
   ]
+}
+const logger = winston.createLogger({
+  level: "info",
+  format: winston.format.json(),
+  defaultMeta: { service: "user-service" },
+  transports
 })
 
 exports.logger = logger

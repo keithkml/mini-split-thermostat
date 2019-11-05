@@ -1,4 +1,6 @@
 const { test } = require("tape")
+const testing = require("../testing")
+testing.setInUnitTest()
 const { Home, Room } = require("../home")
 const ir = require("../ir")
 const codes = require("../codes")
@@ -106,5 +108,46 @@ test("should not repeat commands when there are multiple optimal states", functi
   t.equal(sentA, null)
   t.equal(sentB, null)
 
+  t.end()
+})
+
+test("should turn all devices off cool before turning any on heat", function(t) {
+  let A
+  let sent = []
+  let h = new Home(
+    (A = new Room({
+      name: "A",
+      temp: { ideal: 70 },
+      fanSetting: "auto",
+      blaster: {
+        sendData(x) {
+          sent.push("A")
+        }
+      }
+    })),
+    (B = new Room({
+      name: "B",
+      temp: { ideal: 70 },
+      fanSetting: "auto",
+      blaster: {
+        sendData(x) {
+          sent.push("B")
+        }
+      }
+    }))
+  )
+
+  A.temp.current = 71
+  B.temp.current = 70
+  t.deepEqual(h.computeOptimalState(), [["cool", "off"]])
+  h.applyOptimalState()
+  t.deepEqual(sent, ["B", "A"])
+
+  sent.splice(0, 2)
+  A.temp.current = 71
+  B.temp.current = 68
+  t.deepEqual(h.computeOptimalState(), [["off", "heat"]])
+  h.applyOptimalState()
+  t.deepEqual(sent, ["A", "B"])
   t.end()
 })

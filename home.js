@@ -95,10 +95,12 @@ class Home {
       return false
     }
     const newConfiguration = this.optimalConfigurations[0]
+    // Gotta turn devices off first otherwise the whole system dies
     for (let i = 0; i < this.rooms.length; i++) {
-      let room = this.rooms[i]
-      let c = newConfiguration[i]
-      room.configure(c)
+      if (newConfiguration[i] == "off") this.rooms[i].configure(newConfiguration[i])
+    }
+    for (let i = 0; i < this.rooms.length; i++) {
+      if (newConfiguration[i] != "off") this.rooms[i].configure(newConfiguration[i])
     }
     this.currentConfiguration = newConfiguration
     return true
