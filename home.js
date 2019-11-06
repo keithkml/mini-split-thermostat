@@ -153,8 +153,9 @@ class Room {
     }
     let data =
       mode == "off" ? ir.getBuffer("off") : ir.getBuffer(mode, this.fanSetting, this.temp.ideal)
-    this.blaster.sendData(data)
     logger.info(`Configuring ${this.name} for ${mode} ${this.fanSetting} -> ${this.temp.ideal} F`)
+    this.blaster.sendData(data)
+    if (this.turnOffStatusLight) this.blaster.sendData(ir.getBuffer("lightoff"))
     return true
   }
 }

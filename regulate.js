@@ -11,15 +11,16 @@ const HUE_USERNAME = process.env.HUE_USERNAME
  * Don't thrash; allow a margin of error +/- 1 degree
  * Minimize changes, especially at night, to reduce beeping. Need a change scoring function
  * Allow changing desired temperature by time of day
- * Turn off the status LED after changing
+ ✅ Turn off the status LED after changing
  * Reconfigure everything every hour or two in case someone changed it
- * Log to ELK or some logging service
+ ✅ Log to ELK or some logging service
  * Text owner when there are incompatible changes
  * Be more resilient to errors
  * Reset connection to Broadlink and Hue every few hours
  * Use getSensorById instead of enumerating every time
  * Publish the change to index.js and then make this *use* broadlinkjs instead of forking it
- * Turn all devices off before switching from heat to cool or vice versa
+ ✅ Turn all devices off before switching from heat to cool or vice versa
+ * Pause between IR signals, and send them twice to make sure they took
  */
 
 let mousepad = new home.Home(

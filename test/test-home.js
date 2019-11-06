@@ -151,3 +151,31 @@ test("should turn all devices off cool before turning any on heat", function(t) 
   t.deepEqual(sent, ["A", "B"])
   t.end()
 })
+
+test("turn status light off after change", function(t) {
+  let A
+  let sent = []
+  let h = new Home(
+    (A = new Room({
+      name: "A",
+      temp: { ideal: 70 },
+      fanSetting: "auto",
+      turnOffStatusLight: true,
+      blaster: {
+        sendData(x) {
+          sent.push(x.toString("hex"))
+        }
+      }
+    }))
+  )
+
+  A.temp.current = 71
+  t.deepEqual(h.computeOptimalState(), [["cool"]])
+  h.applyOptimalState()
+  t.deepEqual(sent, [
+    ir.getBuffer("cool", "auto", 70).toString("hex"),
+    ir.getBuffer("lightoff").toString("hex")
+  ])
+
+  t.end()
+})
