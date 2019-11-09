@@ -137,21 +137,22 @@ class Home {
 class Room {
   constructor(options) {
     this.overshootIdealTemp = 2
-    for (let k in options) {
-      this[k] = options[k]
-    }
+    this.priority = 1
+    for (let k in options) this[k] = options[k]
   }
 
   scoreModeChange(proposedMode) {
-    // We prefer "off" if we're not valid, even though it doesn't really matter. It helps the optimizer make better decisions.
+    // We prefer "off" if we're not valid
     if (!this.isValid()) return proposedMode == "off" ? 0 : -A_LOT
+    return this.priority * this.scoreModeChangeWithoutPriority(proposedMode)
+  }
+
+  scoreModeChangeWithoutPriority(proposedMode) {
     // Check for danger first
-    if (this.temp.current < this.temp.min) {
+    if (this.temp.current < this.temp.min)
       if (proposedMode == "heat") return A_LOT * (this.temp.min - this.temp.current)
-    }
-    if (this.temp.current > this.temp.max) {
+    if (this.temp.current > this.temp.max)
       if (proposedMode == "cool") return A_LOT * (this.temp.current - this.temp.max)
-    }
     // desiredChange will be negative if we'd like to cool the room
     const desiredChange = this.temp.ideal - this.temp.current
     if (proposedMode == "cool") {
@@ -181,7 +182,9 @@ class Room {
     }
     const temp = this.temp.ideal + (mode == "heat" ? 1 : -1) * this.overshootIdealTemp
     let data = mode == "off" ? ir.getBuffer("off") : ir.getBuffer(mode, this.fanSetting, temp)
-    logger.info(`Configuring ${this.name} for ${mode} ${this.fanSetting} -> ${temp} F`)
+    logger.info(
+      `Configuring ${this.name} (currently ${this.temp.current} F) for ${mode} ${this.fanSetting} -> ${temp} F`
+    )
     this.blaster.sendData(data)
     if (this.turnOffStatusLight && mode != "off") {
       await sleep(1000)

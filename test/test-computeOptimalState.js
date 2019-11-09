@@ -76,6 +76,22 @@ test("should work with 2 rooms which have INCOMPATIBLE needs but no clear winner
   t.end()
 })
 
+test("should honor priority", function(t) {
+  let A, B
+  let h = new Home(
+    (A = new Room({ name: "A", temp: { ideal: 70 }, priority: 0.1 })),
+    (B = new Room({ name: "B", temp: { ideal: 70 } }))
+  )
+
+  A.temp.current = 71
+  B.temp.current = 69
+  t.deepEqual(h.computeOptimalState(), [["off", "heat"]])
+  B.priority = 0.001
+  t.deepEqual(h.computeOptimalState(), [["cool", "off"]])
+
+  t.end()
+})
+
 test("should work with 2 rooms which have INCOMPATIBLE needs and a clear winner", function(t) {
   let A, B
   let h = new Home(
