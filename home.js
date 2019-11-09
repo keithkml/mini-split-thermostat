@@ -91,17 +91,19 @@ class Home {
       logger.error("no optimal configurations")
       return false
     }
+    const now = Date.now()
     if (
       this.currentConfiguration &&
       this.optimalConfigurations.some(
         c =>
           arraysEqual(c, this.currentConfiguration) &&
-          Date.now() - this.lastRefreshMs < this.maxRefreshIntervalMs
+          now - this.lastRefreshMs < this.maxRefreshIntervalMs
       )
     ) {
       logger.info("we're already in an optimal configuration; not changing anything")
       return false
     }
+    this.lastRefreshMs = now
     const newConfiguration = this.optimalConfigurations[0]
     let doneAnythingYet = false
     // Gotta turn devices off first otherwise the whole system dies

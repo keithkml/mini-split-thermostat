@@ -73,7 +73,7 @@ test("should not repeat commands in a simple case", async function(t) {
   t.end()
 })
 
-test.only("should repeat commands 6 hours later", async function(t) {
+test("should repeat commands 6 hours later", async function(t) {
   let A
   let sent
   let h = new Home(
