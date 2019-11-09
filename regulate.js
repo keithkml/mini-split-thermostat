@@ -74,32 +74,38 @@ let mousepad = new home.Home(
   })
 )
 
-let devices = new broadlink()
+function scanForDevices() {
+  let devices = new broadlink()
 
-devices.on("deviceReady", dev => {
-  let mac = dev.mac.toString("hex")
-  for (let room of mousepad.rooms)
-    if (room.blasterMacAddress == mac) {
-      room.blaster = dev
-      logger.info(
-        "Device ready: " + room.name + " - " + dev.getType() + " " + dev.host.address + " " + mac
-      )
-      return
-    }
-  logger.info(
-    "Unknown device ready: " +
-      room.name +
-      " - " +
-      dev.getType() +
-      " " +
-      dev.host.address +
-      " " +
-      mac
-  )
-})
+  devices.on("deviceReady", dev => {
+    let mac = dev.mac.toString("hex")
+    for (let room of mousepad.rooms)
+      if (room.blasterMacAddress == mac) {
+        room.blaster = dev
+        logger.info(
+          "Device ready: " + room.name + " - " + dev.getType() + " " + dev.host.address + " " + mac
+        )
+        return
+      }
+    logger.info(
+      "Unknown device ready: " +
+        room.name +
+        " - " +
+        dev.getType() +
+        " " +
+        dev.host.address +
+        " " +
+        mac
+    )
+  })
 
-logger.info("Looking for Broadlink devices on the LAN...")
-devices.discover()
+  logger.info("Looking for Broadlink devices on the LAN...")
+  devices.discover()
+}
+
+// This seeems to only pick up 3 devices out of the 4 in the house, so let's run it twice
+scanForDevices()
+scanForDevices()
 
 logger.info("Starting Hue sensor polling...")
 temps.startPollingSensors(HUE_USERNAME, async sensor => {
