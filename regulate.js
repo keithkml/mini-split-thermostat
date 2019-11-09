@@ -34,18 +34,34 @@ let mousepad = new home.Home(
       max: 80
     },
     fanSetting: "auto"
+  }),
+  new home.Room({
+    name: "Rec Room",
+    sensorId: "00:17:88:01:04:b6:89:68-02-0402",
+    temp: {
+      ideal: 77,
+      min: 72,
+      max: 80
+    }
+  }),
+  new home.Room({
+    name: "Bedroom",
+    sensorId: "00:17:88:01:06:f5:f1:d5-02-0402",
+    temp: {
+      ideal: 77,
+      min: 72,
+      max: 80
+    }
+  }),
+  new home.Room({
+    name: "Nursery",
+    sensorId: "00:17:88:01:02:01:2e:d5-02-0402",
+    temp: {
+      ideal: 77,
+      min: 72,
+      max: 80
+    }
   })
-  // new Room({
-  //     name: "Rec Room",
-  //     sensorId: '00:17:88:01:04:b6:89:68-02-0402'
-  // }),
-  // new Room({
-  //     name: "Bedroom",
-  //     sensorId: '00:17:88:01:02:01:2e:d5-02-0402'
-  // })
-  // Nursery: {
-  //     sensorId: 'XXX'
-  // }
 )
 
 let devices = new broadlink()
@@ -71,9 +87,11 @@ temps.startPollingSensors(HUE_USERNAME, sensor => {
       if (room.temp.current != temp) {
         logger.info(room.name + " is now " + temp + " F")
         room.temp.current = temp
+        return
       }
     }
   }
+  logger.info("there's a sensor we're not using: " + sensor.uniqueId, sensor.state)
 })
 
 setInterval(() => mousepad.computeOptimalState(), 60 * 1000)

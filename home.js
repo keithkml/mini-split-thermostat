@@ -15,6 +15,8 @@ const notAllOff = configuration => configuration.some(c => c != "off")
 
 const A_LOT = 10000
 
+const sleep = async ms => new Promise(resolve => setTimeout(resolve, ms))
+
 function arraysEqual(a, b) {
   if (a === b) return true
   if (a == null || b == null) return false
@@ -25,15 +27,15 @@ function arraysEqual(a, b) {
   // Please note that calling sort on an array will modify that array.
   // you might want to clone your array first.
 
-  for (var i = 0; i < a.length; ++i) {
-    if (a[i] !== b[i]) return false
-  }
+  for (let i = 0; i < a.length; ++i) if (a[i] !== b[i]) return false
+
   return true
 }
 
 class Home {
   constructor(...rooms) {
     this.rooms = rooms
+    this.sleepBetweenCommands = 1000
     this.allConfigurations = [
       ...permuteConfigurations("cool", rooms.length),
       ...permuteConfigurations("heat", rooms.length)
@@ -82,7 +84,7 @@ class Home {
       .map(a => a.configuration))
   }
 
-  applyOptimalState() {
+  async applyOptimalState() {
     if (!this.optimalConfigurations || !this.optimalConfigurations.length) {
       logger.error("no optimal configurations")
       return false
@@ -95,12 +97,21 @@ class Home {
       return false
     }
     const newConfiguration = this.optimalConfigurations[0]
+    let doneAnythingYet = false
     // Gotta turn devices off first otherwise the whole system dies
     for (let i = 0; i < this.rooms.length; i++) {
-      if (newConfiguration[i] == "off") this.rooms[i].configure(newConfiguration[i])
+      if (newConfiguration[i] == "off") {
+        if (doneAnythingYet) await sleep(this.sleepBetweenCommands)
+        await this.rooms[i].configure(newConfiguration[i])
+        doneAnythingYet = true
+      }
     }
     for (let i = 0; i < this.rooms.length; i++) {
-      if (newConfiguration[i] != "off") this.rooms[i].configure(newConfiguration[i])
+      if (newConfiguration[i] != "off") {
+        if (doneAnythingYet) await sleep(this.sleepBetweenCommands)
+        await this.rooms[i].configure(newConfiguration[i])
+        doneAnythingYet = true
+      }
     }
     this.currentConfiguration = newConfiguration
     return true
@@ -146,7 +157,7 @@ class Room {
     return !isNaN(this.temp.current) && typeof this.temp.current == "number"
   }
 
-  configure(mode) {
+  async configure(mode) {
     if (!this.isValid) {
       logger.warn("Skipping configuration of " + this.name + " because we're not valid")
       return false
@@ -155,7 +166,10 @@ class Room {
       mode == "off" ? ir.getBuffer("off") : ir.getBuffer(mode, this.fanSetting, this.temp.ideal)
     logger.info(`Configuring ${this.name} for ${mode} ${this.fanSetting} -> ${this.temp.ideal} F`)
     this.blaster.sendData(data)
-    if (this.turnOffStatusLight) this.blaster.sendData(ir.getBuffer("lightoff"))
+    if (this.turnOffStatusLight && mode != "off") {
+      await sleep(1000)
+      this.blaster.sendData(ir.getBuffer("lightoff"))
+    }
     return true
   }
 }
