@@ -35,6 +35,8 @@ function arraysEqual(a, b) {
 class Home {
   constructor(...rooms) {
     this.rooms = rooms
+    this.lastRefreshMs = 0
+    this.maxRefreshIntervalMs = 6 * 60 * 60 * 1000
     this.sleepBetweenCommands = 1000
     this.allConfigurations = [
       ...permuteConfigurations("cool", rooms.length),
@@ -91,7 +93,11 @@ class Home {
     }
     if (
       this.currentConfiguration &&
-      this.optimalConfigurations.some(c => arraysEqual(c, this.currentConfiguration))
+      this.optimalConfigurations.some(
+        c =>
+          arraysEqual(c, this.currentConfiguration) &&
+          Date.now() - this.lastRefreshMs < this.maxRefreshIntervalMs
+      )
     ) {
       logger.info("we're already in an optimal configuration; not changing anything")
       return false

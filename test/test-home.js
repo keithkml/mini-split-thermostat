@@ -73,6 +73,36 @@ test("should not repeat commands in a simple case", async function(t) {
   t.end()
 })
 
+test.only("should repeat commands 6 hours later", async function(t) {
+  let A
+  let sent
+  let h = new Home(
+    (A = new Room({
+      name: "A",
+      temp: { ideal: 70 },
+      fanSetting: "auto",
+      blaster: {
+        sendData(x) {
+          sent = x.toString("hex")
+        }
+      }
+    }))
+  )
+
+  const cool = ir.getBuffer("cool", "auto", 68).toString("hex")
+
+  A.temp.current = 71
+  t.deepEqual(h.computeOptimalState(), [["cool"]])
+  await h.applyOptimalState()
+  t.equal(sent, cool)
+  clock.tick(7 * 60 * 60 * 1000)
+  sent = null
+  await h.applyOptimalState()
+  t.equal(sent, cool)
+
+  t.end()
+})
+
 test("should not repeat commands when there are multiple optimal states", async function(t) {
   let A
   let sentA, sentB
