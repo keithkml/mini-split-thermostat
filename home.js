@@ -128,6 +128,7 @@ class Home {
 
 class Room {
   constructor(options) {
+    this.overshootIdealTemp = 2
     for (let k in options) {
       this[k] = options[k]
     }
@@ -170,9 +171,9 @@ class Room {
       logger.warn("Skipping configuration of " + this.name + " because we're not valid")
       return false
     }
-    let data =
-      mode == "off" ? ir.getBuffer("off") : ir.getBuffer(mode, this.fanSetting, this.temp.ideal)
-    logger.info(`Configuring ${this.name} for ${mode} ${this.fanSetting} -> ${this.temp.ideal} F`)
+    const temp = this.temp.ideal + (mode == "heat" ? 1 : -1) * this.overshootIdealTemp
+    let data = mode == "off" ? ir.getBuffer("off") : ir.getBuffer(mode, this.fanSetting, temp)
+    logger.info(`Configuring ${this.name} for ${mode} ${this.fanSetting} -> ${temp} F`)
     this.blaster.sendData(data)
     if (this.turnOffStatusLight && mode != "off") {
       await sleep(1000)

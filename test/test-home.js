@@ -29,7 +29,7 @@ test("should do the obvious thing with a single room", async function(t) {
   t.deepEqual(h.computeOptimalState(), [["cool"]])
   h.applyOptimalState()
   await clock.tickAsync(5000)
-  t.equal(sent.toString("hex"), ir.getBuffer("cool", "auto", 70).toString("hex"))
+  t.equal(sent.toString("hex"), ir.getBuffer("cool", "auto", 68).toString("hex"))
 
   A.temp.current = 70
   t.deepEqual(h.computeOptimalState(), [["off"]])
@@ -41,7 +41,7 @@ test("should do the obvious thing with a single room", async function(t) {
   t.deepEqual(h.computeOptimalState(), [["heat"]])
   h.applyOptimalState()
   await clock.tickAsync(5000)
-  t.equal(sent.toString("hex"), ir.getBuffer("heat", "auto", 70).toString("hex"))
+  t.equal(sent.toString("hex"), ir.getBuffer("heat", "auto", 72).toString("hex"))
 
   t.end()
 })
@@ -65,7 +65,7 @@ test("should not repeat commands in a simple case", async function(t) {
   A.temp.current = 71
   t.deepEqual(h.computeOptimalState(), [["cool"]])
   await h.applyOptimalState()
-  t.equal(sent, ir.getBuffer("cool", "auto", 70).toString("hex"))
+  t.equal(sent, ir.getBuffer("cool", "auto", 68).toString("hex"))
   sent = null
   await h.applyOptimalState()
   t.equal(sent, null)
@@ -104,7 +104,7 @@ test("should not repeat commands when there are multiple optimal states", async 
   t.deepEqual(h.computeOptimalState(), [["cool", "off"]])
   h.applyOptimalState()
   await clock.tickAsync(1200)
-  t.equal(sentA, ir.getBuffer("cool", "auto", 70).toString("hex"))
+  t.equal(sentA, ir.getBuffer("cool", "auto", 68).toString("hex"))
   t.equal(sentB, ir.getBuffer("off").toString("hex"))
 
   // now create a situation where there are two optimal cases, which includes the previous one
@@ -229,7 +229,7 @@ test("turn status light off after change", async function(t) {
   A.temp.current = 71
   t.deepEqual(h.computeOptimalState(), [["cool"]])
   h.applyOptimalState()
-  const cool = ir.getBuffer("cool", "auto", 70).toString("hex")
+  const cool = ir.getBuffer("cool", "auto", 68).toString("hex")
   t.deepEqual(sent, [cool])
   await clock.tickAsync(5000)
   t.deepEqual(sent, [cool, ir.getBuffer("lightoff").toString("hex")])

@@ -57,7 +57,8 @@ let mousepad = new home.Home(
       min: 72,
       max: 80
     },
-    fanSetting: "auto"
+    fanSetting: "auto",
+    turnOffStatusLight: true
   }),
   new home.Room({
     name: "Nursery",
@@ -68,7 +69,8 @@ let mousepad = new home.Home(
       min: 72,
       max: 80
     },
-    fanSetting: "auto"
+    fanSetting: "auto",
+    turnOffStatusLight: true
   })
 )
 
