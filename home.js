@@ -102,14 +102,22 @@ class Home {
     for (let i = 0; i < this.rooms.length; i++) {
       if (newConfiguration[i] == "off") {
         if (doneAnythingYet) await sleep(this.sleepBetweenCommands)
-        await this.rooms[i].configure(newConfiguration[i])
+        try {
+          await this.rooms[i].configure(newConfiguration[i])
+        } catch (e) {
+          logger.error(this.rooms[i].name, e)
+        }
         doneAnythingYet = true
       }
     }
     for (let i = 0; i < this.rooms.length; i++) {
       if (newConfiguration[i] != "off") {
         if (doneAnythingYet) await sleep(this.sleepBetweenCommands)
-        await this.rooms[i].configure(newConfiguration[i])
+        try {
+          await this.rooms[i].configure(newConfiguration[i])
+        } catch (e) {
+          logger.error(this.rooms[i].name, e)
+        }
         doneAnythingYet = true
       }
     }

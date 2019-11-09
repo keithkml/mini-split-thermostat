@@ -13,6 +13,6 @@ exports.getBuffer = function(...names) {
     for (var name of names) x = x[name]
     return Buffer.from(x, "hex")
   } catch (e) {
-    throw new Error("could not find IRR codes for " + names)
+    throw new Error("could not find IR codes for " + names)
   }
 }

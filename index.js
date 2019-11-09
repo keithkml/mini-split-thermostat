@@ -11,6 +11,7 @@ var Broadlink = (module.exports = function() {
 util.inherits(Broadlink, EventEmitter)
 
 Broadlink.prototype.genDevice = function(devtype, host, mac) {
+  console.log(devtype, host, mac)
   var dev
   if (devtype == 0) {
     // SP1
