@@ -4,8 +4,20 @@ let broadlink = require("./index")
 let temps = require("./temps")
 let home = require("./home")
 const { logger } = require("./logging")
+const process = require("process")
 
 const HUE_USERNAME = process.env.HUE_USERNAME
+
+process.on("uncaughtException", function(err) {
+  logger.error(err)
+})
+process.on("beforeExit", code => {
+  logger.warn("beforeExit event with code: ", code)
+})
+
+process.on("exit", code => {
+  logger.warn("exit event with code: ", code)
+})
 
 /*
  * TODO ideas:
