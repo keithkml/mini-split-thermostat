@@ -10,13 +10,14 @@ const HUE_USERNAME = process.env.HUE_USERNAME
 /*
  * TODO ideas:
  *
- * - Don't thrash; allow a margin of error +/- 1 degree
- * - Minimize changes, especially at night, to reduce beeping. Need a change scoring function
  * - Allow changing desired temperature by time of day
  * ✅ Turn off the status LED after changing
  * ✅ Reconfigure everything every hour or two in case someone changed it
  * ✅ Log to ELK or some logging service
+ * - Improve logging (log full room state periodically)
+ * - Text to speech to announce major changes
  * - Text owner when there are incompatible changes
+ * - Text owner on exit
  * ✅ Be more resilient to errors
  * - Reset connection to Broadlink and Hue every few hours
  * - Use getSensorById instead of enumerating every time
@@ -35,6 +36,14 @@ let mousepad = new home.Home(
       min: 72,
       max: 80
     },
+    // schedule: {
+    //   "8am": {
+    //     priority: 1
+    //   },
+    //   "9pm": {
+    //     priority: 0.1
+    //   }
+    // },
     fanSetting: "auto"
   }),
   new home.Room({
