@@ -11,6 +11,7 @@ const HUE_USERNAME = process.env.HUE_USERNAME
  * TODO ideas:
  *
  * - Allow changing desired temperature by time of day
+ * - Allow preferring fan instead of off
  * ✅ Turn off the status LED after changing
  * ✅ Reconfigure everything every hour or two in case someone changed it
  * ✅ Log to ELK or some logging service
@@ -31,55 +32,96 @@ let mousepad = new home.Home(
     name: "Living Room",
     sensorId: "00:17:88:01:04:b6:75:75-02-0402",
     blasterMacAddress: "9d276801a8c0",
-    temp: {
-      ideal: 77,
-      min: 72,
-      max: 80
-    },
-    // schedule: {
-    //   "8am": {
-    //     priority: 1
-    //   },
-    //   "9pm": {
-    //     priority: 0.1
-    //   }
-    // },
-    fanSetting: "auto"
+    schedule: {
+      "5am": {
+        temp: {
+          ideal: 76,
+          min: 72,
+          max: 80
+        },
+        priority: 0.5
+      },
+      "8am": { priority: 1 },
+      "7pm": { priority: 0.5 },
+      "11pm": { priority: 0.1 }
+    }
   }),
   new home.Room({
     name: "Rec Room",
     sensorId: "00:17:88:01:04:b6:89:68-02-0402",
     blasterMacAddress: "9d276901a8c0",
-    temp: {
-      ideal: 77,
-      min: 72,
-      max: 80
-    },
-    fanSetting: "auto"
+    schedule: {
+      "6am": {
+        temp: {
+          ideal: 74,
+          min: 70,
+          max: 78
+        },
+        turnOffStatusLight: false,
+        priority: 10
+      },
+      "6pm": {
+        temp: {
+          ideal: 68,
+          min: 66,
+          max: 74
+        },
+        turnOffStatusLight: true,
+        priority: 1
+      }
+    }
   }),
   new home.Room({
     name: "Bedroom",
     sensorId: "00:17:88:01:06:f5:f1:d5-02-0402",
     blasterMacAddress: "9d278901a8c0",
-    temp: {
-      ideal: 77,
-      min: 72,
-      max: 80
-    },
-    fanSetting: "auto",
-    turnOffStatusLight: true
+    schedule: {
+      "8am": {
+        temp: {
+          ideal: 74,
+          min: 70,
+          max: 78
+        },
+        fanSetting: "auto",
+        turnOffStatusLight: false,
+        priority: 1
+      },
+      "6pm": {
+        temp: {
+          ideal: 68,
+          min: 66,
+          max: 72
+        },
+        fanSetting: "high",
+        turnOffStatusLight: true,
+        priority: 2
+      }
+    }
   }),
   new home.Room({
     name: "Nursery",
     sensorId: "00:17:88:01:02:01:2e:d5-02-0402",
     blasterMacAddress: "9d27b801a8c0",
-    temp: {
-      ideal: 77,
-      min: 72,
-      max: 80
-    },
-    fanSetting: "auto",
-    turnOffStatusLight: true
+    schedule: {
+      "6pm": {
+        temp: {
+          ideal: 70,
+          min: 66,
+          max: 74
+        },
+        turnOffStatusLight: true,
+        priority: 10
+      },
+      "8am": {
+        temp: {
+          ideal: 74,
+          min: 70,
+          max: 78
+        },
+        turnOffStatusLight: false,
+        priority: 1
+      }
+    }
   })
 )
 

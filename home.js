@@ -1,5 +1,6 @@
 const ir = require("./ir")
 const { logger } = require("./logging")
+const { Schedule } = require("./schedule")
 
 function permuteConfigurations(mode, numberOfRooms) {
   if (numberOfRooms == 1) return [["off"], [mode]]
@@ -138,7 +139,10 @@ class Room {
   constructor(options) {
     this.overshootIdealTemp = 2
     this.priority = 1
+    this.temp = {}
+    this.fanSetting = "auto"
     for (let k in options) this[k] = options[k]
+    this.scheduleObject = new Schedule(this, this.schedule)
   }
 
   scoreModeChange(proposedMode) {
@@ -190,7 +194,12 @@ class Room {
       await sleep(1000)
       this.blaster.sendData(ir.getBuffer("lightoff"))
     }
+    this.currentMode = mode
     return true
+  }
+
+  toString() {
+    return this.name + " (" + this.temp.current + " F) " + this.currentMode
   }
 }
 
