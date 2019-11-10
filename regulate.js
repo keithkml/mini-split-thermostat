@@ -10,7 +10,7 @@ const HUE_USERNAME = process.env.HUE_USERNAME
 /*
  * TODO ideas:
  *
- * - Allow changing desired temperature by time of day
+ * ✅ Allow changing desired temperature by time of day
  * - Allow preferring fan instead of off
  * ✅ Turn off the status LED after changing
  * ✅ Reconfigure everything every hour or two in case someone changed it
