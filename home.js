@@ -142,7 +142,7 @@ class Room {
     this.temp = {}
     this.fanSetting = "auto"
     for (let k in options) this[k] = options[k]
-    this.scheduleObject = new Schedule(this, this.schedule)
+    if (this.schedule) this.scheduleObject = new Schedule(this, this.schedule)
   }
 
   scoreModeChange(proposedMode) {
@@ -190,7 +190,8 @@ class Room {
       `Configuring ${this.name} (currently ${this.temp.current} F) for ${mode} ${this.fanSetting} -> ${temp} F`
     )
     this.blaster.sendData(data)
-    if (this.turnOffStatusLight && mode != "off") {
+    if (this.turnOffStatusLight) {
+      // We need to do this even for "off" because sometimes the lights stay on for a few minutes
       await sleep(1000)
       this.blaster.sendData(ir.getBuffer("lightoff"))
     }

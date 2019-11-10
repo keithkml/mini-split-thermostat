@@ -264,5 +264,14 @@ test("turn status light off after change", async function(t) {
   await clock.tickAsync(5000)
   t.deepEqual(sent, [cool, ir.getBuffer("lightoff").toString("hex")])
 
+  sent.splice(0, 2)
+  A.temp.current = 70
+  t.deepEqual(h.computeOptimalState(), [["off"]])
+  h.applyOptimalState()
+  const off = ir.getBuffer("off").toString("hex")
+  t.deepEqual(sent, [off])
+  await clock.tickAsync(5000)
+  t.deepEqual(sent, [off, ir.getBuffer("lightoff").toString("hex")])
+
   t.end()
 })
