@@ -193,6 +193,48 @@ test("should turn all devices off cool before turning any on heat", async functi
   t.end()
 })
 
+test("should not send commands already sent", async function(t) {
+  let A
+  let sent = []
+  let h = new Home(
+    (A = new Room({
+      name: "A",
+      temp: { ideal: 70 },
+      fanSetting: "auto",
+      blaster: {
+        sendData(x) {
+          sent.push("A")
+        }
+      }
+    })),
+    (B = new Room({
+      name: "B",
+      temp: { ideal: 70 },
+      fanSetting: "auto",
+      blaster: {
+        sendData(x) {
+          sent.push("B")
+        }
+      }
+    }))
+  )
+
+  A.temp.current = 71
+  B.temp.current = 70
+  t.deepEqual(h.computeOptimalState(), [["cool", "off"]])
+  h.applyOptimalState()
+  await clock.tickAsync(5000)
+  t.deepEqual(sent, ["B", "A"])
+
+  sent.splice(0, 2)
+  B.temp.current = 71
+  t.deepEqual(h.computeOptimalState(), [["cool", "cool"]])
+  h.applyOptimalState()
+  await clock.tickAsync(5000)
+  t.deepEqual(sent, ["B"])
+  t.end()
+})
+
 test("should delay when transitioning from cool to heat", async function(t) {
   let A
   let sent = []

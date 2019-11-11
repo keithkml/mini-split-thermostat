@@ -93,13 +93,11 @@ class Home {
       return false
     }
     const now = Date.now()
+    const force = now - this.lastRefreshMs >= this.maxRefreshIntervalMs
     if (
       this.currentConfiguration &&
-      this.optimalConfigurations.some(
-        c =>
-          arraysEqual(c, this.currentConfiguration) &&
-          now - this.lastRefreshMs < this.maxRefreshIntervalMs
-      )
+      this.optimalConfigurations.some(c => arraysEqual(c, this.currentConfiguration)) &&
+      !force
     ) {
       logger.info("we're already in an optimal configuration; not changing anything")
       return false
@@ -112,7 +110,7 @@ class Home {
       if (newConfiguration[i] == "off") {
         if (doneAnythingYet) await sleep(this.sleepBetweenCommands)
         try {
-          await this.rooms[i].configure(newConfiguration[i])
+          await this.rooms[i].configure(newConfiguration[i], force)
         } catch (e) {
           logger.error(this.rooms[i].name, e)
         }
@@ -123,7 +121,7 @@ class Home {
       if (newConfiguration[i] != "off") {
         if (doneAnythingYet) await sleep(this.sleepBetweenCommands)
         try {
-          await this.rooms[i].configure(newConfiguration[i])
+          await this.rooms[i].configure(newConfiguration[i], force)
         } catch (e) {
           logger.error(this.rooms[i].name, e)
         }
@@ -141,6 +139,7 @@ class Room {
     this.priority = 1
     this.temp = {}
     this.fanSetting = "auto"
+    this.currentMode = null
     for (let k in options) this[k] = options[k]
     if (this.schedule) this.scheduleObject = new Schedule(this, this.schedule)
   }
@@ -179,7 +178,11 @@ class Room {
     return !isNaN(this.temp.current) && typeof this.temp.current == "number"
   }
 
-  async configure(mode) {
+  async configure(mode, force) {
+    if (mode == this.currentMode && !force) {
+      logger.warn("Skipping configuration of " + this.name + " because we're already in " + mode)
+      return false
+    }
     if (!this.isValid) {
       logger.warn("Skipping configuration of " + this.name + " because we're not valid")
       return false
