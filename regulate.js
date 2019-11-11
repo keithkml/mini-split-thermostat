@@ -73,6 +73,9 @@ let mousepad = new home.Home(
         priority: 10
       },
       "6pm": {
+        priority: 0.1
+      },
+      "10pm": {
         temp: {
           ideal: 68,
           min: 66,
