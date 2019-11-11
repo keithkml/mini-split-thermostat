@@ -100,8 +100,7 @@ class Home {
       !force
     ) {
       logger.info("we're already in an optimal configuration; not changing anything", {
-        type: "optimal",
-        ...this.getLogFields()
+        type: "optimal"
       })
       return false
     }
@@ -194,7 +193,7 @@ class Room {
   async configure(mode, force) {
     if (!this.isValid) {
       logger.warn("Skipping configuration of " + this.name + " because we're not valid", {
-        ...getLogFields()
+        ...this.getLogFields()
       })
       return false
     }
@@ -206,7 +205,7 @@ class Room {
       !force
     ) {
       logger.warn("Skipping configuration of " + this.name + " because it hasn't changed", {
-        ...getLogFields()
+        ...this.getLogFields()
       })
       return
     }
