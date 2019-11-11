@@ -9,14 +9,14 @@ const process = require("process")
 const HUE_USERNAME = process.env.HUE_USERNAME
 
 process.on("uncaughtException", function(err) {
-  logger.error(err)
+  logger.error("" + err, { err })
 })
 process.on("beforeExit", code => {
-  logger.warn("beforeExit event with code: ", code)
+  logger.warn("beforeExit event with code: ", { code })
 })
 
 process.on("exit", code => {
-  logger.warn("exit event with code: ", code)
+  logger.warn("exit event with code: ", { code })
 })
 
 /*
@@ -149,20 +149,12 @@ function scanForDevices() {
       if (room.blasterMacAddress == mac) {
         room.blaster = dev
         logger.info(
-          "Device ready: " + room.name + " - " + dev.getType() + " " + dev.host.address + " " + mac
+          "Device ready: " + room.name + " - " + dev.getType() + " " + dev.host.address + " " + mac,
+          { name: room.name, type: dev.getType(), address: dev.host.address, mac }
         )
         return
       }
-    logger.info(
-      "Unknown device ready: " +
-        room.name +
-        " - " +
-        dev.getType() +
-        " " +
-        dev.host.address +
-        " " +
-        mac
-    )
+    logger.info("Unknown device ready: " + dev.getType() + " " + dev.host.address + " " + mac)
   })
 
   logger.info("Looking for Broadlink devices on the LAN...")
@@ -180,13 +172,17 @@ temps.startPollingSensors(HUE_USERNAME, async sensor => {
       room.sensor = sensor
       let temp = ((sensor.state.attributes.attributes.temperature / 100) * 9) / 5 + 32
       if (room.temp.current != temp) {
-        logger.info(room.name + " is now " + temp + " F")
+        let old = room.temp.current
         room.temp.current = temp
+        logger.info(room.name + " is now " + temp + " F", { old, ...room.getLogFields() })
       }
       return
     }
   }
-  logger.info("there's a sensor we're not using: " + sensor.uniqueId, sensor.state)
+  logger.info("there's a sensor we're not using: " + sensor.uniqueId, {
+    uniqueId: sensor.uniqueId,
+    attributes: sensor.state.attributes.attributes
+  })
 })
 
 setInterval(() => mousepad.computeOptimalState(), 60 * 1000)

@@ -99,7 +99,10 @@ class Home {
       this.optimalConfigurations.some(c => arraysEqual(c, this.currentConfiguration)) &&
       !force
     ) {
-      logger.info("we're already in an optimal configuration; not changing anything")
+      logger.info("we're already in an optimal configuration; not changing anything", {
+        type: "optimal",
+        ...this.getLogFields()
+      })
       return false
     }
     this.lastRefreshMs = now
@@ -112,7 +115,11 @@ class Home {
         try {
           await this.rooms[i].configure(newConfiguration[i], force)
         } catch (e) {
-          logger.error(this.rooms[i].name, e)
+          logger.error(this.rooms[i].name + " - " + e, {
+            ...this.rooms[i].getLogFields(),
+            errorMessage: "" + e,
+            mode: newConfiguration[i]
+          })
         }
         doneAnythingYet = true
       }
@@ -123,7 +130,11 @@ class Home {
         try {
           await this.rooms[i].configure(newConfiguration[i], force)
         } catch (e) {
-          logger.error(this.rooms[i].name, e)
+          logger.error(this.rooms[i].name + " - " + e, {
+            ...this.rooms[i].getLogFields(),
+            errorMessage: "" + e,
+            mode: newConfiguration[i]
+          })
         }
         doneAnythingYet = true
       }
@@ -172,7 +183,7 @@ class Room {
       // return negative score for status quo unless desiredChange is zero
       return -Math.abs(desiredChange)
     // should never happen
-    logger.error("proposedMode was ", proposedMode)
+    logger.error("no score for proposedMode ", { proposedMode, ...this.getLogFields() })
     return 0
   }
 
@@ -182,7 +193,9 @@ class Room {
 
   async configure(mode, force) {
     if (!this.isValid) {
-      logger.warn("Skipping configuration of " + this.name + " because we're not valid")
+      logger.warn("Skipping configuration of " + this.name + " because we're not valid", {
+        ...getLogFields()
+      })
       return false
     }
     const temp = this.temp.ideal + (mode == "heat" ? 1 : -1) * this.overshootIdealTemp
@@ -192,11 +205,14 @@ class Room {
       data.toString("hex") == this.currentIRData.toString("hex") &&
       !force
     ) {
-      logger.warn("Skipping configuration of " + this.name + " because it hasn't changed")
+      logger.warn("Skipping configuration of " + this.name + " because it hasn't changed", {
+        ...getLogFields()
+      })
       return
     }
     logger.info(
-      `Configuring ${this.name} (currently ${this.temp.current} F) for ${mode} ${this.fanSetting} -> ${temp} F`
+      `Configuring ${this.name} (currently ${this.temp.current} F) for ${mode} ${this.fanSetting} -> ${temp} F`,
+      { ...this.getLogFields(), newMode: mode, targetTemp: temp }
     )
     this.blaster.sendData(data)
     if (this.turnOffStatusLight) {
@@ -207,6 +223,10 @@ class Room {
     this.currentMode = mode
     this.currentIRData = data
     return true
+  }
+
+  getLogFields() {
+    return { name: this.name, priority: this.priority, ...this.temp, fanSetting: this.fanSetting }
   }
 
   toString() {

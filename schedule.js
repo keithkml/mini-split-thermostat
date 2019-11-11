@@ -47,7 +47,11 @@ class Schedule {
       deepExtend(toApply, this.times[k].values)
     }
     if (!deepEqual(toApply, this.lastApplied)) {
-      logger.info("Scheduled change of " + this.target, { ...toApply, old: this.lastApplied })
+      logger.info("Scheduled change of " + this.target, {
+        target: this.target.toString(),
+        ...toApply,
+        old: this.lastApplied
+      })
       deepExtend(this.target, toApply)
       this.lastApplied = toApply
     }

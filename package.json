@@ -34,7 +34,8 @@
     "deep-extend": "^0.6.0",
     "huejay": "^1.9.0",
     "winston": "^3.2.1",
-    "winston-cloudwatch": "^2.2.0"
+    "winston-cloudwatch": "^2.2.0",
+    "winston-elasticsearch": "^0.8.2"
   },
   "directories": {
     "test": "test"

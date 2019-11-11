@@ -1,5 +1,6 @@
 const winston = require("winston")
 const testing = require("./testing")
+const process = require("process")
 var AWS = require("aws-sdk")
 const WinstonCloudWatch = require("winston-cloudwatch")
 
@@ -33,6 +34,7 @@ if (testing.isUnitTest()) {
     new WinstonCloudWatch({
       logGroupName: "temps",
       logStreamName: "temps",
+      jsonMessage: true,
       awsRegion: "us-east-2"
     })
   ]
@@ -40,7 +42,7 @@ if (testing.isUnitTest()) {
 const logger = winston.createLogger({
   level: "info",
   format: winston.format.json(),
-  defaultMeta: {},
+  defaultMeta: { pid: process.pid },
   transports
 })
 
