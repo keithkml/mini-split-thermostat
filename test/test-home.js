@@ -103,7 +103,56 @@ test("should repeat commands 6 hours later", async function(t) {
   t.end()
 })
 
-test("should not repeat commands when there are multiple optimal states", async function(t) {
+test("should not repeat commands when there are multiple optimal states (ignoring change cost)", async function(t) {
+  let A
+  let sentA, sentB
+  let h = new Home(
+    (A = new Room({
+      name: "A",
+      temp: { ideal: 70 },
+      fanSetting: "auto",
+      changeCost: 0,
+      blaster: {
+        sendData(x) {
+          sentA = x.toString("hex")
+        }
+      }
+    })),
+    (B = new Room({
+      name: "B",
+      temp: { ideal: 70 },
+      fanSetting: "auto",
+      changeCost: 0,
+      blaster: {
+        sendData(x) {
+          sentB = x.toString("hex")
+        }
+      }
+    }))
+  )
+
+  A.temp.current = 72
+  B.temp.current = 70
+  t.deepEqual(h.computeOptimalState(), [["cool", "off"]])
+  h.applyOptimalState()
+  await clock.tickAsync(1200)
+  t.equal(sentA, ir.getBuffer("cool", "auto", 68).toString("hex"))
+  t.equal(sentB, ir.getBuffer("off").toString("hex"))
+
+  // now create a situation where there are two optimal cases, which includes the previous one
+  B.temp.current = 68
+  t.deepEqual(h.computeOptimalState(), [["cool", "off"], ["off", "heat"]])
+
+  sentA = sentB = null
+  h.applyOptimalState()
+  await clock.tickAsync(1200)
+  t.equal(sentA, null)
+  t.equal(sentB, null)
+
+  t.end()
+})
+
+test("should not change unless difference higher than change cost", async function(t) {
   let A
   let sentA, sentB
   let h = new Home(
@@ -137,15 +186,23 @@ test("should not repeat commands when there are multiple optimal states", async 
   t.equal(sentA, ir.getBuffer("cool", "auto", 68).toString("hex"))
   t.equal(sentB, ir.getBuffer("off").toString("hex"))
 
-  // now create a situation where there are two optimal cases, which includes the previous one
-  B.temp.current = 69
-  t.deepEqual(h.computeOptimalState(), [["cool", "off"], ["off", "heat"]])
+  B.temp.current = 70.5
+  t.deepEqual(h.computeOptimalState(), [["cool", "off"]])
 
   sentA = sentB = null
   h.applyOptimalState()
   await clock.tickAsync(1200)
   t.equal(sentA, null)
   t.equal(sentB, null)
+
+  B.temp.current = 72
+  t.deepEqual(h.computeOptimalState(), [["cool", "cool"]])
+
+  sentA = sentB = null
+  h.applyOptimalState()
+  await clock.tickAsync(1200)
+  t.equal(sentA, null) // was already sent
+  t.equal(sentB, ir.getBuffer("cool", "auto", 68).toString("hex"))
 
   t.end()
 })
@@ -176,7 +233,7 @@ test("should turn all devices off cool before turning any on heat", async functi
     }))
   )
 
-  A.temp.current = 71
+  A.temp.current = 72
   B.temp.current = 70
   t.deepEqual(h.computeOptimalState(), [["cool", "off"]])
   h.applyOptimalState()
@@ -184,7 +241,7 @@ test("should turn all devices off cool before turning any on heat", async functi
   t.deepEqual(sent, ["B", "A"])
 
   sent.splice(0, 2)
-  A.temp.current = 71
+  A.temp.current = 70
   B.temp.current = 68
   t.deepEqual(h.computeOptimalState(), [["off", "heat"]])
   h.applyOptimalState()
@@ -311,7 +368,7 @@ test("should delay when transitioning from cool to heat", async function(t) {
   t.deepEqual(sent, ["B", "A"])
 
   sent.splice(0, 2)
-  A.temp.current = 71
+  A.temp.current = 70
   B.temp.current = 68
   t.deepEqual(h.computeOptimalState(), [["off", "heat"]])
   h.applyOptimalState()

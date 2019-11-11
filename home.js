@@ -139,6 +139,7 @@ class Room {
     this.priority = 1
     this.temp = {}
     this.fanSetting = "auto"
+    this.changeCost = 1.1
     this.currentMode = null
     for (let k in options) this[k] = options[k]
     if (this.schedule) this.scheduleObject = new Schedule(this, this.schedule)
@@ -147,7 +148,8 @@ class Room {
   scoreModeChange(proposedMode) {
     // We prefer "off" if we're not valid
     if (!this.isValid()) return proposedMode == "off" ? 0 : -A_LOT
-    return this.priority * this.scoreModeChangeWithoutPriority(proposedMode)
+    const changeCost = this.currentMode == proposedMode ? 0 : this.changeCost
+    return this.priority * (this.scoreModeChangeWithoutPriority(proposedMode) - changeCost)
   }
 
   scoreModeChangeWithoutPriority(proposedMode) {
