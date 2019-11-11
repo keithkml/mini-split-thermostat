@@ -179,16 +179,20 @@ class Room {
   }
 
   async configure(mode, force) {
-    if (mode == this.currentMode && !force) {
-      logger.warn("Skipping configuration of " + this.name + " because we're already in " + mode)
-      return false
-    }
     if (!this.isValid) {
       logger.warn("Skipping configuration of " + this.name + " because we're not valid")
       return false
     }
     const temp = this.temp.ideal + (mode == "heat" ? 1 : -1) * this.overshootIdealTemp
     let data = mode == "off" ? ir.getBuffer("off") : ir.getBuffer(mode, this.fanSetting, temp)
+    if (
+      this.currentIRData &&
+      data.toString("hex") == this.currentIRData.toString("hex") &&
+      !force
+    ) {
+      logger.warn("Skipping configuration of " + this.name + " because it hasn't changed")
+      return
+    }
     logger.info(
       `Configuring ${this.name} (currently ${this.temp.current} F) for ${mode} ${this.fanSetting} -> ${temp} F`
     )
@@ -199,6 +203,7 @@ class Room {
       this.blaster.sendData(ir.getBuffer("lightoff"))
     }
     this.currentMode = mode
+    this.currentIRData = data
     return true
   }
 

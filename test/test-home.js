@@ -222,10 +222,11 @@ test("should not send commands already sent", async function(t) {
   A.temp.current = 71
   B.temp.current = 70
   t.deepEqual(h.computeOptimalState(), [["cool", "off"]])
-  h.applyOptimalState()
+  const promise = h.applyOptimalState()
   await clock.tickAsync(5000)
   t.deepEqual(sent, ["B", "A"])
 
+  await promise
   sent.splice(0, 2)
   B.temp.current = 71
   t.deepEqual(h.computeOptimalState(), [["cool", "cool"]])
@@ -234,6 +235,46 @@ test("should not send commands already sent", async function(t) {
   t.deepEqual(sent, ["B"])
   t.end()
 })
+
+//TODO: should send commands if slightly different
+// test("should send commands if slightly different", async function(t) {
+//   let A
+//   let sent
+//   let h = new Home(
+//     (A = new Room({
+//       name: "A",
+//       temp: { ideal: 70 },
+//       fanSetting: "auto",
+//       blaster: {
+//         sendData(x) {
+//           sent = x
+//         }
+//       }
+//     }))
+//   )
+
+//   A.temp.current = 73
+//   t.deepEqual(h.computeOptimalState(), [["cool"]])
+//   h.applyOptimalState()
+//   await clock.tickAsync(5000)
+//   t.equal(sent.toString("hex"), ir.getBuffer("cool", "auto", 68).toString("hex"))
+
+//   sent = null
+//   A.temp.ideal = 71
+//   t.deepEqual(h.computeOptimalState(), [["cool"]])
+//   h.applyOptimalState()
+//   await clock.tickAsync(5000)
+//   t.equal(sent.toString("hex"), ir.getBuffer("cool", "auto", 67).toString("hex"))
+
+//   sent = null
+//   A.fanSetting = "high"
+//   t.deepEqual(h.computeOptimalState(), [["cool"]])
+//   h.applyOptimalState()
+//   await clock.tickAsync(5000)
+//   t.equal(sent.toString("hex"), ir.getBuffer("cool", "high", 67).toString("hex"))
+
+//   t.end()
+// })
 
 test("should delay when transitioning from cool to heat", async function(t) {
   let A
