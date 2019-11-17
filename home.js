@@ -209,9 +209,12 @@ class Room {
       })
       return
     }
+    this.currentMode = mode
+    this.temp.target = temp
+    this.currentIRData = data
     logger.info(
       `Configuring ${this.name} (currently ${this.temp.current} F) for ${mode} ${this.fanSetting} -> ${temp} F`,
-      { ...this.getLogFields(), newMode: mode, targetTemp: temp }
+      { ...this.getLogFields() }
     )
     this.blaster.sendData(data)
     if (this.turnOffStatusLight) {
@@ -219,8 +222,6 @@ class Room {
       await sleep(1000)
       this.blaster.sendData(ir.getBuffer("lightoff"))
     }
-    this.currentMode = mode
-    this.currentIRData = data
     return true
   }
 
