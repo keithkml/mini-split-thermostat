@@ -225,7 +225,15 @@ class Room {
   }
 
   getLogFields() {
-    return { name: this.name, priority: this.priority, ...this.temp, fanSetting: this.fanSetting }
+    return {
+      name: this.name,
+      mode: this.currentMode,
+      modeNumeric: this.currentMode == "off" ? 0 : this.currentMode == "cool" ? -1 : 1,
+      priority: this.priority,
+      ...this.temp,
+      diff: this.temp.ideal - this.temp.current,
+      fanSetting: this.fanSetting
+    }
   }
 
   toString() {
