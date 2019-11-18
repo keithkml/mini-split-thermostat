@@ -47,7 +47,7 @@ let mousepad = new home.Home(
     schedule: {
       "5am": {
         temp: {
-          ideal: 76,
+          ideal: 75,
           min: 72,
           max: 80
         },
