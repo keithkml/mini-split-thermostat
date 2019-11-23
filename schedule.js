@@ -48,7 +48,7 @@ class Schedule {
     }
     if (!deepEqual(toApply, this.lastApplied)) {
       logger.info("Scheduled change of " + this.target, {
-        target: this.target.toString(),
+        targetObj: this.target.toString(),
         ...toApply,
         old: this.lastApplied
       })
