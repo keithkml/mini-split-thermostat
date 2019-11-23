@@ -178,7 +178,7 @@ temps.startPollingSensors(HUE_USERNAME, async sensor => {
     if (sensor.uniqueId == room.sensorId) {
       room.sensor = sensor
       let temp = ((sensor.state.attributes.attributes.temperature / 100) * 9) / 5 + 32
-      let old = room.temp.current
+      let oldTemp = room.temp.current
       room.temp.current = temp
       logger.info(room.name + " is now " + temp + " F", { oldTemp, ...room.getLogFields() })
       return
