@@ -43,7 +43,7 @@ let mousepad = new home.Home(
   new home.Room({
     name: "Living Room",
     sensorId: "00:17:88:01:04:b6:75:75-02-0402",
-    blasterMacAddress: "9d276801a8c0",
+    blasterMacAddress: "9d276601a8c0",
     schedule: {
       "5am": {
         temp: {
@@ -61,7 +61,7 @@ let mousepad = new home.Home(
   new home.Room({
     name: "Rec Room",
     sensorId: "00:17:88:01:04:b6:89:68-02-0402",
-    blasterMacAddress: "9d276901a8c0",
+    blasterMacAddress: "9d276701a8c0",
     schedule: {
       "6am": {
         temp: {
@@ -116,7 +116,7 @@ let mousepad = new home.Home(
   new home.Room({
     name: "Nursery",
     sensorId: "00:17:88:01:02:01:2e:d5-02-0402",
-    blasterMacAddress: "9d27b801a8c0",
+    blasterMacAddress: "9d27b701a8c0",
     schedule: {
       "6pm": {
         temp: {
