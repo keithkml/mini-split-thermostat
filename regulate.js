@@ -141,6 +141,8 @@ let mousepad = new home.Home(
 )
 
 function scanForDevices() {
+  logger.info("Looking for Broadlink devices on the LAN...")
+
   let devices = new broadlink()
 
   devices.on("deviceReady", dev => {
@@ -156,14 +158,19 @@ function scanForDevices() {
       }
     logger.info("Unknown device ready: " + dev.getType() + " " + dev.host.address + " " + mac)
   })
-
-  logger.info("Looking for Broadlink devices on the LAN...")
   devices.discover()
 }
 
-// This seeems to only pick up 3 devices out of the 4 in the house, so let's run it twice
-scanForDevices()
-scanForDevices()
+function scanForDevicesUntilAll() {
+  if (!mousepad.rooms.some(r => !r.blaster)) {
+    return
+  }
+  scanForDevices()
+  setTimeout(scanForDevicesUntilAll, 1000)
+}
+
+// Each call seeems to only pick up 3 devices out of the 4 in the house, so let's run it until we get them all
+scanForDevicesUntilAll()
 
 logger.info("Starting Hue sensor polling...")
 temps.startPollingSensors(HUE_USERNAME, async sensor => {
