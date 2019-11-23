@@ -190,9 +190,19 @@ temps.startPollingSensors(HUE_USERNAME, async sensor => {
   })
 })
 
+function logAllRooms() {
+  for (let room of mousepad.rooms) {
+    logger.info("Current status", { periodicStatus: true, ...room.getLogFields() })
+  }
+}
+
 setInterval(() => mousepad.computeOptimalState(), 60 * 1000)
-setInterval(() => mousepad.applyOptimalState(), 5 * 60 * 1000)
+setInterval(() => {
+  mousepad.applyOptimalState()
+  logAllRooms()
+}, 5 * 60 * 1000)
 setTimeout(() => {
   mousepad.computeOptimalState()
   mousepad.applyOptimalState()
+  logAllRooms()
 }, 15 * 1000)
