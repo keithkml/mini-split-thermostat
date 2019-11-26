@@ -27,10 +27,10 @@ process.on("exit", code => {
  * ✅ Turn off the status LED after changing
  * ✅ Reconfigure everything every hour or two in case someone changed it
  * ✅ Log to ELK or some logging service
- * - Improve logging (log full room state periodically)
+ * ✅ Improve logging (log full room state periodically)
  * - Text to speech to announce major changes
  * - Text owner when there are incompatible changes
- * - Text owner on exit
+ * ✅ Alert owner on exit (done via CloudWatch alerts)
  * ✅ Be more resilient to errors
  * - Reset connection to Broadlink and Hue every few hours
  * - Use getSensorById instead of enumerating every time
@@ -116,7 +116,7 @@ let mousepad = new home.Home(
   new home.Room({
     name: "Nursery",
     sensorId: "00:17:88:01:02:01:2e:d5-02-0402",
-    blasterMacAddress: "9d27b701a8c0",
+    blasterMacAddress: "9d27b601a8c0",
     schedule: {
       "6pm": {
         temp: {
