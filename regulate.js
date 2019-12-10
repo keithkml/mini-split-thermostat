@@ -35,8 +35,9 @@ process.on("exit", code => {
  * - Reset connection to Broadlink and Hue every few hours
  * - Use getSensorById instead of enumerating every time
  * - Publish the change to index.js and then make this *use* broadlinkjs instead of forking it
- * ✅ Turn all devices off before switching from heat to cool or vice versa
+ * ✅ Turn devices off before switching from heat to cool or vice versa
  * ✅ Pause between IR signals
+ * - Turn all devices off and back on every few hours, in case one got stuck
  */
 
 let mousepad = new home.Home(
@@ -47,7 +48,7 @@ let mousepad = new home.Home(
     schedule: {
       "5am": {
         temp: {
-          ideal: 75,
+          ideal: 74,
           min: 72,
           max: 80
         },
@@ -65,17 +66,17 @@ let mousepad = new home.Home(
     schedule: {
       "6am": {
         temp: {
-          ideal: 74,
-          min: 70,
+          ideal: 73,
+          min: 69,
           max: 78
         },
         turnOffStatusLight: false,
-        priority: 10
+        priority: 2
       },
       "6pm": {
         priority: 0.1
       },
-      "10pm": {
+      "8pm": {
         temp: {
           ideal: 68,
           min: 66,
@@ -125,7 +126,7 @@ let mousepad = new home.Home(
           max: 74
         },
         turnOffStatusLight: true,
-        priority: 10
+        priority: 3
       },
       "8am": {
         temp: {
