@@ -169,7 +169,9 @@ class Room {
   scoreModeChange(proposedMode) {
     // We prefer "off" if we're not valid
     if (!this.isValid()) return proposedMode == "off" ? 0 : -A_LOT
-    const changeCost = this.currentMode == proposedMode ? 0 : this.changeCost
+    // It's always OK to turn OFF. We wouldn't want to stay on too long and then have to overcorrect
+    const changeCost =
+      this.currentMode == proposedMode || proposedMode == "off" ? 0 : this.changeCost
     return this.priority * (this.scoreModeChangeWithoutPriority(proposedMode) - changeCost)
   }
 
