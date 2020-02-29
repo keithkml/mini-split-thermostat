@@ -156,16 +156,33 @@ function scanForDevices() {
   devices.discover()
 }
 
-function scanForDevicesUntilAll() {
+// Each call seeems to only pick up 3 devices out of the 4 in the house, so let's run it until we get them all
+function scanForDevicesAgain(resolve, reject) {
   if (!mousepad.rooms.some(r => !r.blaster)) {
+    logger.info("Found all devices")
+    resolve()
     return
   }
   scanForDevices()
-  setTimeout(scanForDevicesUntilAll, 1000)
+  setTimeout(() => scanForDevicesAgain(resolve, reject), 400)
 }
 
-// Each call seeems to only pick up 3 devices out of the 4 in the house, so let's run it until we get them all
-scanForDevicesUntilAll()
+function scanForDevicesUntilAll() {
+  return new Promise(scanForDevicesAgain)
+}
+
+function waitForTemperaturesAgain(resolve, reject) {
+  if (!mousepad.rooms.some(r => !r.temp.current)) {
+    logger.info("Got all temperatures")
+    resolve()
+    return
+  }
+  setTimeout(() => waitForTemperaturesAgain(resolve, reject), 400)
+}
+
+function waitForAllTemperatures() {
+  return new Promise(waitForTemperaturesAgain)
+}
 
 logger.info("Starting Hue sensor polling...")
 temps.startPollingSensors(HUE_USERNAME, async sensor => {
@@ -191,15 +208,26 @@ function logAllRooms() {
   }
 }
 
-setInterval(() => mousepad.computeOptimalState(), 60 * 1000)
-setInterval(() => {
-  mousepad.applyOptimalState()
-  logAllRooms()
-}, 5 * 60 * 1000)
-setTimeout(() => {
+function startTimers() {
   mousepad.computeOptimalState()
   mousepad.applyOptimalState()
   logAllRooms()
-}, 30 * 1000)
+  logger.info("Starting timers")
+  setInterval(() => mousepad.computeOptimalState(), 60 * 1000)
+  setInterval(() => {
+    mousepad.applyOptimalState()
+    logAllRooms()
+  }, 5 * 60 * 1000)
+}
+
+async function main() {
+  await scanForDevicesUntilAll()
+  await waitForAllTemperatures()
+  startTimers()
+}
+
+main()
+  .then(console.log)
+  .catch(console.error)
 
 module.exports = { mousepad }
