@@ -107,6 +107,15 @@ class Home {
     this.lastRefreshMs = now
     const newConfiguration = this.optimalConfigurations[0]
     let doneAnythingYet = false
+    if (force) {
+      // On startup, and periodically when refresh expires, let's turn the device OFF and
+      // then back on, in case stuff got messed up
+      for (let i = 0; i < this.rooms.length; i++) {
+        await this.rooms[i].configure("off", force, null)
+      }
+      doneAnythingYet = true
+    }
+    this.lastRefreshMs = now
     // Gotta turn devices off first otherwise the whole system dies
     for (let i = 0; i < this.rooms.length; i++) {
       if (newConfiguration[i] == "off") {
@@ -123,6 +132,8 @@ class Home {
         doneAnythingYet = true
       }
     }
+    //TODO: is there a bug here? do we need to be turning OFF in between switching multiple
+    // devices from heat->cool, to prevent HVAC system deadlock?
     for (let i = 0; i < this.rooms.length; i++) {
       if (newConfiguration[i] != "off") {
         if (doneAnythingYet) await sleep(this.sleepBetweenCommands)
