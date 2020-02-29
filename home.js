@@ -37,7 +37,7 @@ class Home {
   constructor(...rooms) {
     this.rooms = rooms
     this.lastRefreshMs = 0
-    this.maxRefreshIntervalMs = 6 * 60 * 60 * 1000
+    this.maxRefreshIntervalMs = 4 * 60 * 60 * 1000
     this.sleepBetweenCommands = 1000
     this.allConfigurations = [
       ...permuteConfigurations("cool", rooms.length),
