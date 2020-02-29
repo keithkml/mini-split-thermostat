@@ -44,7 +44,7 @@ let mousepad = new home.Home(
   new home.Room({
     name: "Living Room",
     sensorId: "00:17:88:01:04:b6:75:75-02-0402",
-    blasterMacAddress: "9d276601a8c0",
+    blasterMacAddress: "9d277b00a8c0",
     schedule: {
       "5am": {
         temp: {
@@ -60,41 +60,39 @@ let mousepad = new home.Home(
     }
   }),
   new home.Room({
-    name: "Rec Room",
+    name: "Nursery",
     sensorId: "00:17:88:01:04:b6:89:68-02-0402",
-    blasterMacAddress: "9d276701a8c0",
+    blasterMacAddress: "9d279200a8c0",
     schedule: {
-      "6am": {
+      "5am": {
         temp: {
           ideal: 73,
           min: 69,
           max: 78
         },
-        turnOffStatusLight: false,
-        priority: 2
+        priority: 3
       },
+	"7am": {
+	    turnOffStatusLight: false,
+	},
       "6pm": {
-        priority: 0.1
-      },
-      "8pm": {
         temp: {
           ideal: 68,
           min: 66,
           max: 74
         },
         turnOffStatusLight: true,
-        priority: 1
-      }
+      },
     }
   }),
   new home.Room({
     name: "Bedroom",
     sensorId: "00:17:88:01:06:f5:f1:d5-02-0402",
-    blasterMacAddress: "9d278901a8c0",
+      blasterMacAddress: "9d278600a8c0",
     schedule: {
       "8am": {
         temp: {
-          ideal: 74,
+          ideal: 76,
           min: 70,
           max: 78
         },
@@ -102,10 +100,10 @@ let mousepad = new home.Home(
         turnOffStatusLight: false,
         priority: 1
       },
-      "6pm": {
+      "8pm": {
         temp: {
-          ideal: 68,
-          min: 66,
+          ideal: 67,
+          min: 62,
           max: 72
         },
         fanSetting: "high",
@@ -115,28 +113,24 @@ let mousepad = new home.Home(
     }
   }),
   new home.Room({
-    name: "Nursery",
+    name: "Office",
     sensorId: "00:17:88:01:02:01:2e:d5-02-0402",
-    blasterMacAddress: "9d27b601a8c0",
+    blasterMacAddress: "9d27b700a8c0",
     schedule: {
-      "6pm": {
+      "9pm": {
         temp: {
-          ideal: 70,
-          min: 66,
-          max: 74
+          ideal: 68,
+          min: 64,
+          max: 72
         },
         turnOffStatusLight: true,
-        priority: 3
+        priority: 0.1
       },
-      "8am": {
-        temp: {
-          ideal: 74,
-          min: 70,
-          max: 78
-        },
+	"7am": {
+	    temp: {ideal: 76, min: 67, max: 78},
         turnOffStatusLight: false,
         priority: 1
-      }
+      },
     }
   })
 )
@@ -206,4 +200,6 @@ setTimeout(() => {
   mousepad.computeOptimalState()
   mousepad.applyOptimalState()
   logAllRooms()
-}, 15 * 1000)
+}, 30 * 1000)
+
+module.exports = {mousepad}
