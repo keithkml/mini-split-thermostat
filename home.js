@@ -63,6 +63,7 @@ class Home {
       }
       let total = score.reduce((a, b) => a + b, 0)
       logger.info("score: " + total + " (" + score.join("+") + ") <-- " + configuration)
+      annotated.scores = score
       annotated.score = total
     }
     annotatedConfigurations.sort((a, b) => {
@@ -82,9 +83,7 @@ class Home {
       return aStr > bStr ? 1 : -1
     })
     let bestScore = annotatedConfigurations[0].score
-    return (this.optimalConfigurations = annotatedConfigurations
-      .filter(a => a.score == bestScore)
-      .map(a => a.configuration))
+    return (this.optimalConfigurations = annotatedConfigurations.filter(a => a.score == bestScore))
   }
 
   async applyOptimalState() {
@@ -94,18 +93,19 @@ class Home {
     }
     const now = Date.now()
     const force = now - this.lastRefreshMs >= this.maxRefreshIntervalMs
+    let newConfigurationAnnotated
     if (
       this.currentConfiguration &&
-      this.optimalConfigurations.some(c => arraysEqual(c, this.currentConfiguration)) &&
-      !force
+      this.optimalConfigurations.some(c => arraysEqual(c.configuration, this.currentConfiguration))
     ) {
-      logger.info("we're already in an optimal configuration; not changing anything", {
+      logger.info("we're already in an optimal configuration; reapplying existing config", {
         type: "optimal"
       })
-      return false
+      newConfigurationAnnotated = this.currentConfigurationAnnotated
+    } else {
+      newConfigurationAnnotated = this.optimalConfigurations[0]
     }
-    this.lastRefreshMs = now
-    const newConfiguration = this.optimalConfigurations[0]
+    const newConfiguration = newConfigurationAnnotated.configuration
     let doneAnythingYet = false
     if (force) {
       // On startup, and periodically when refresh expires, let's turn the device OFF and
@@ -121,7 +121,11 @@ class Home {
       if (newConfiguration[i] == "off") {
         if (doneAnythingYet) await sleep(this.sleepBetweenCommands)
         try {
-          await this.rooms[i].configure(newConfiguration[i], force)
+          await this.rooms[i].configure(
+            newConfiguration[i],
+            force,
+            newConfigurationAnnotated.scores[i]
+          )
         } catch (e) {
           logger.error(this.rooms[i].name + " - " + e, {
             ...this.rooms[i].getLogFields(),
@@ -138,7 +142,11 @@ class Home {
       if (newConfiguration[i] != "off") {
         if (doneAnythingYet) await sleep(this.sleepBetweenCommands)
         try {
-          await this.rooms[i].configure(newConfiguration[i], force)
+          await this.rooms[i].configure(
+            newConfiguration[i],
+            force,
+            newConfigurationAnnotated.scores[i]
+          )
         } catch (e) {
           logger.error(this.rooms[i].name + " - " + e, {
             ...this.rooms[i].getLogFields(),
@@ -150,6 +158,7 @@ class Home {
       }
     }
     this.currentConfiguration = newConfiguration
+    this.currentConfigurationAnnotated = newConfigurationAnnotated
     return true
   }
 }
@@ -162,6 +171,7 @@ class Room {
     this.fanSetting = "auto"
     this.changeCost = 1.1
     this.currentMode = null
+    this.scoreOfLastModeChange = null
     for (let k in options) this[k] = options[k]
     if (this.schedule) this.scheduleObject = new Schedule(this, this.schedule)
   }
@@ -203,7 +213,13 @@ class Room {
     return !isNaN(this.temp.current) && typeof this.temp.current == "number"
   }
 
-  async configure(mode, force) {
+  /**
+   *
+   * @param {String} mode the new mode, like "cool"
+   * @param {Boolean} force whether to do it even if we don't think it will have any effect
+   * @param {Number} score the score we provided for this configuration
+   */
+  async configure(mode, force, score) {
     if (!this.isValid) {
       logger.warn("Skipping configuration of " + this.name + " because we're not valid", {
         ...this.getLogFields()
@@ -223,6 +239,7 @@ class Room {
       return
     }
     this.currentMode = mode
+    this.scoreOfLastModeChange = score
     this.temp.target = temp
     this.currentIRData = data
     logger.info(
@@ -244,6 +261,7 @@ class Room {
     return {
       name: this.name,
       mode: this.currentMode,
+      scoreOfLastModeChange: this.scoreOfLastModeChange,
       modeNumeric: this.currentMode == "off" ? 0 : this.currentMode == "cool" ? -1 : 1,
       priority: this.priority,
       ...this.temp,
