@@ -13,7 +13,6 @@ function pollSensors(client, callback) {
     })
     .catch(error => {
       logger.error(error.stack)
-      exitHorribly()
     })
 }
 
@@ -31,6 +30,5 @@ exports.startPollingSensors = function(username, callback) {
     })
     .catch(error => {
       logger.error(`An error occurred: ${error.message}`)
-      exitHorribly()
     })
 }
