@@ -72,23 +72,23 @@ let mousepad = new home.Home(
         },
         priority: 3
       },
-	"7am": {
-	    turnOffStatusLight: false,
-	},
+      "7am": {
+        turnOffStatusLight: false
+      },
       "6pm": {
         temp: {
           ideal: 68,
           min: 66,
           max: 74
         },
-        turnOffStatusLight: true,
-      },
+        turnOffStatusLight: true
+      }
     }
   }),
   new home.Room({
     name: "Bedroom",
     sensorId: "00:17:88:01:06:f5:f1:d5-02-0402",
-      blasterMacAddress: "9d278600a8c0",
+    blasterMacAddress: "9d278600a8c0",
     schedule: {
       "8am": {
         temp: {
@@ -126,11 +126,11 @@ let mousepad = new home.Home(
         turnOffStatusLight: true,
         priority: 0.1
       },
-	"7am": {
-	    temp: {ideal: 76, min: 67, max: 78},
+      "7am": {
+        temp: { ideal: 76, min: 67, max: 78 },
         turnOffStatusLight: false,
         priority: 1
-      },
+      }
     }
   })
 )
@@ -202,4 +202,4 @@ setTimeout(() => {
   logAllRooms()
 }, 30 * 1000)
 
-module.exports = {mousepad}
+module.exports = { mousepad }

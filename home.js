@@ -217,7 +217,7 @@ class Room {
       { ...this.getLogFields() }
     )
     this.blaster.sendData(data)
-      await sleep(1000)
+    await sleep(1000)
     this.blaster.sendData(data)
     if (this.turnOffStatusLight) {
       // We need to do this even for "off" because sometimes the lights stay on for a few minutes

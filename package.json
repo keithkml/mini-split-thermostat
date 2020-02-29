@@ -5,7 +5,7 @@
   "main": "broadlink.js",
   "types": "index.d.ts",
   "scripts": {
-    "test": "node test/test-optimization.js"
+    "test": "node test/test.js"
   },
   "repository": {
     "type": "git",
