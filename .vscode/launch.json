@@ -7,6 +7,13 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Run",
+      "program": "${workspaceFolder}/regulate.js",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "test-schedule",
       "program": "${workspaceFolder}/test/test-schedule.js"
     },
