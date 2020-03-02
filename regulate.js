@@ -219,11 +219,11 @@ function startTimers() {
   mousepad.applyOptimalState()
   logAllRooms()
   logger.info("Starting timers")
-  setInterval(() => mousepad.computeOptimalState(), 60 * 1000)
   setInterval(() => {
+    mousepad.computeOptimalState()
     mousepad.applyOptimalState()
     logAllRooms()
-  }, 5 * 60 * 1000)
+  }, 30 * 1000)
 }
 
 async function main() {

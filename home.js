@@ -62,7 +62,7 @@ class Home {
         score.push(s)
       }
       let total = score.reduce((a, b) => a + b, 0)
-      logger.info("score: " + total + " (" + score.join("+") + ") <-- " + configuration)
+      // logger.info("score: " + total + " (" + score.join("+") + ") <-- " + configuration)
       annotated.scores = score
       annotated.score = total
     }
@@ -234,7 +234,7 @@ class Room {
       data.toString("hex") == this.currentIRData.toString("hex") &&
       !force
     ) {
-      logger.warn("Skipping configuration of " + this.name + " because it hasn't changed", {
+      logger.info("Skipping configuration of " + this.name + " because it hasn't changed", {
         ...this.getLogFields()
       })
       return
@@ -247,11 +247,14 @@ class Room {
       `Configuring ${this.name} (currently ${this.temp.current} F) for ${mode} ${this.fanSetting} -> ${temp} F`,
       { ...this.getLogFields() }
     )
+    // Repeat this in case there's packet loss
     this.blaster.sendData(data)
     await sleep(1000)
     this.blaster.sendData(data)
     if (this.turnOffStatusLight) {
       // We need to do this even for "off" because sometimes the lights stay on for a few minutes
+      // Unfortunately we can't repeat this one, as it's a toggle, so sending twice would just
+      // turn the light off and back on
       await sleep(1000)
       this.blaster.sendData(ir.getBuffer("lightoff"))
     }
