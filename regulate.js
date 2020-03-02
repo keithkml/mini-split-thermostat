@@ -43,7 +43,7 @@ process.on("exit", code => {
 let mousepad = new home.Home(
   new home.Room({
     name: "Living Room",
-    sensorId: "00:17:88:01:04:b6:75:75-02-0402",
+    sensorPrefix: "00:17:88:01:04:b6:75:75-02",
     blasterMacAddress: "9d277b00a8c0",
     schedule: {
       "5am": {
@@ -61,7 +61,7 @@ let mousepad = new home.Home(
   }),
   new home.Room({
     name: "Nursery",
-    sensorId: "00:17:88:01:04:b6:89:68-02-0402",
+    sensorPrefix: "00:17:88:01:04:b6:89:68-02",
     blasterMacAddress: "9d279200a8c0",
     schedule: {
       "5am": {
@@ -87,7 +87,7 @@ let mousepad = new home.Home(
   }),
   new home.Room({
     name: "Bedroom",
-    sensorId: "00:17:88:01:06:f5:f1:d5-02-0402",
+    sensorPrefix: "00:17:88:01:06:f5:f1:d5-02",
     blasterMacAddress: "9d278600a8c0",
     schedule: {
       "8am": {
@@ -114,7 +114,7 @@ let mousepad = new home.Home(
   }),
   new home.Room({
     name: "Office",
-    sensorId: "00:17:88:01:02:01:2e:d5-02-0402",
+    sensorPrefix: "00:17:88:01:02:01:2e:d5-02",
     blasterMacAddress: "9d27b700a8c0",
     schedule: {
       "9pm": {
@@ -187,12 +187,18 @@ function waitForAllTemperatures() {
 logger.info("Starting Hue sensor polling...")
 temps.startPollingSensors(HUE_USERNAME, async sensor => {
   for (let room of mousepad.rooms) {
-    if (sensor.uniqueId == room.sensorId) {
-      room.sensor = sensor
-      let temp = ((sensor.state.attributes.attributes.temperature / 100) * 9) / 5 + 32
-      let oldTemp = room.temp.current
-      room.temp.current = temp
-      logger.info(room.name + " is now " + temp + " F", { oldTemp, ...room.getLogFields() })
+    if (sensor.uniqueId.startsWith(room.sensorPrefix)) {
+      const attributes = sensor.state.attributes.attributes
+      if ("temperature" in attributes) {
+        room.sensor = sensor
+        let temp = ((attributes.temperature / 100) * 9) / 5 + 32
+        let oldTemp = room.temp.current
+        room.temp.current = temp
+        logger.info(room.name + " is now " + temp + " F", { oldTemp, ...room.getLogFields() })
+      }
+      if ("lightlevel" in attributes) {
+        room.lightLevel = attributes.lightlevel
+      }
       return
     }
   }

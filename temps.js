@@ -6,7 +6,7 @@ function pollSensors(client, callback) {
     .getAll()
     .then(sensors => {
       for (let sensor of sensors) {
-        if (sensor.type == "ZLLTemperature") {
+        if (sensor.type == "ZLLTemperature" || sensor.type == "ZLLLightLevel") {
           callback(sensor)
         }
       }

@@ -168,6 +168,7 @@ class Room {
     this.overshootIdealTemp = 2
     this.priority = 1
     this.temp = {}
+    this.lightLevel = null
     this.fanSetting = "auto"
     this.changeCost = 1.1
     this.currentMode = null
@@ -265,6 +266,7 @@ class Room {
       modeNumeric: this.currentMode == "off" ? 0 : this.currentMode == "cool" ? -1 : 1,
       priority: this.priority,
       ...this.temp,
+      lightLevel: this.lightLevel,
       diff: this.temp.ideal - this.temp.current,
       fanSetting: this.fanSetting
     }
