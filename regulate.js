@@ -49,7 +49,7 @@ let mousepad = new home.Home(
       "5am": {
         temp: {
           ideal: 74,
-          min: 72,
+          min: 66,
           max: 80
         },
         priority: 0.5
@@ -67,7 +67,7 @@ let mousepad = new home.Home(
       "5am": {
         temp: {
           ideal: 73,
-          min: 69,
+          min: 68,
           max: 78
         },
         priority: 3
@@ -93,7 +93,7 @@ let mousepad = new home.Home(
       "8am": {
         temp: {
           ideal: 76,
-          min: 70,
+          min: 68,
           max: 78
         },
         fanSetting: "auto",
@@ -120,14 +120,18 @@ let mousepad = new home.Home(
       "9pm": {
         temp: {
           ideal: 68,
-          min: 64,
-          max: 72
+          min: 62,
+          max: 80
         },
         turnOffStatusLight: true,
         priority: 0.1
       },
       "7am": {
-        temp: { ideal: 76, min: 67, max: 78 },
+        temp: {
+          ideal: 76,
+          min: 67,
+          max: 80
+        },
         turnOffStatusLight: false,
         priority: 1
       }
