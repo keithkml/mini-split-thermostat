@@ -36,6 +36,7 @@ function arraysEqual(a, b) {
 class Home {
   constructor(...rooms) {
     this.rooms = rooms
+    rooms.forEach(room => room.home = this);
     this.lastRefreshMs = 0
     this.maxRefreshIntervalMs = 4 * 60 * 60 * 1000
     this.sleepBetweenCommands = 1000
@@ -46,6 +47,10 @@ class Home {
     this.allConfigurations.push(this.rooms.map(r => "off"))
     this.optimalConfigurations = null
     this.currentConfiguration = null
+  }
+
+  getRoom(name) {
+    return this.rooms.find(room => room.name == name)
   }
 
   computeOptimalState() {
@@ -173,8 +178,15 @@ class Room {
     this.changeCost = 1.1
     this.currentMode = null
     this.scoreOfLastModeChange = null
+    this.copyModeFromRoomName = null
+    // home is assigned when we're added to a Home
+    this.home = null
     for (let k in options) this[k] = options[k]
     if (this.schedule) this.scheduleObject = new Schedule(this, this.schedule)
+  }
+
+  getScoreSource() {
+    return !this.copyModeFromRoomName ? this : this.home.getRoom(this.copyModeFromRoomName)
   }
 
   scoreModeChange(proposedMode) {
@@ -183,7 +195,8 @@ class Room {
     // It's always OK to turn OFF. We wouldn't want to stay on too long and then have to overcorrect
     const changeCost =
       this.currentMode == proposedMode || proposedMode == "off" ? 0 : this.changeCost
-    return this.priority * (this.scoreModeChangeWithoutPriority(proposedMode) - changeCost)
+      // Priority does not modify change cost - this way, priority of 0.0001 behaves as expected
+    return this.priority * this.getScoreSource().scoreModeChangeWithoutPriority(proposedMode) - changeCost
   }
 
   scoreModeChangeWithoutPriority(proposedMode) {

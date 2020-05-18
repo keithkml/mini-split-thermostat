@@ -37,7 +37,7 @@ process.on("exit", code => {
  * - Publish the change to index.js and then make this *use* broadlinkjs instead of forking it
  * ✅ Turn devices off before switching from heat to cool or vice versa
  * ✅ Pause between IR signals
- * - Turn all devices off and back on every few hours, in case one got stuck
+ * ✅ Turn all devices off and back on every few hours, in case one got stuck
  */
 
 let mousepad = new home.Home(
@@ -88,9 +88,10 @@ let mousepad = new home.Home(
   new home.Room({
     name: "Bedroom",
     sensorPrefix: "00:17:88:01:06:f5:f1:d5-02",
-    blasterMacAddress: "9d278600a8c0",
+    blasterMacAddress: "9d278500a8c0",
+
     schedule: {
-      "8am": {
+      "7am": {
         temp: {
           ideal: 76,
           min: 68,
@@ -109,6 +110,9 @@ let mousepad = new home.Home(
         fanSetting: "high",
         turnOffStatusLight: true,
         priority: 2
+      },
+      "9pm":  {
+        priority: 0.1,
       }
     }
   }),
@@ -116,24 +120,22 @@ let mousepad = new home.Home(
     name: "Office",
     sensorPrefix: "00:17:88:01:02:01:2e:d5-02",
     blasterMacAddress: "9d27b700a8c0",
+    changeCost: 2,
     schedule: {
-      "9pm": {
-        temp: {
-          ideal: 68,
-          min: 62,
-          max: 80
-        },
+      "8pm": {
         turnOffStatusLight: true,
-        priority: 0.1
+        priority: 2,
+        copyModeFromRoomName: "Bedroom"
       },
       "7am": {
         temp: {
-          ideal: 76,
+          ideal: 78,
           min: 67,
           max: 80
         },
+        copyModeFromRoomName: null,
         turnOffStatusLight: false,
-        priority: 1
+        priority: 2
       }
     }
   })
