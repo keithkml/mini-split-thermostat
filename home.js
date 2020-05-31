@@ -36,7 +36,7 @@ function arraysEqual(a, b) {
 class Home {
   constructor(...rooms) {
     this.rooms = rooms
-    rooms.forEach(room => room.home = this);
+    rooms.forEach(room => (room.home = this))
     this.lastRefreshMs = 0
     this.maxRefreshIntervalMs = 4 * 60 * 60 * 1000
     this.sleepBetweenCommands = 1000
@@ -50,7 +50,7 @@ class Home {
   }
 
   getRoom(name) {
-    return this.rooms.find(room => room.name == name)
+    return this.rooms.find(room => room.isNamed(name))
   }
 
   computeOptimalState() {
@@ -168,6 +168,8 @@ class Home {
   }
 }
 
+const canonicalName = name => name.toLowerCase().replace(/[^a-z0-9]+/gi, "")
+
 class Room {
   constructor(options) {
     this.overshootIdealTemp = 2
@@ -183,6 +185,10 @@ class Room {
     this.home = null
     for (let k in options) this[k] = options[k]
     if (this.schedule) this.scheduleObject = new Schedule(this, this.schedule)
+  }
+
+  isNamed(name) {
+    return canonicalName(name) == canonicalName(this.name)
   }
 
   getScoreSource() {
