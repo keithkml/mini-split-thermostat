@@ -1,4 +1,4 @@
-const ir = require("./ir")
+const ir = require("friedrich-mini-split-remote")
 const { logger } = require("./logging")
 const { Schedule } = require("./schedule")
 

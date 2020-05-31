@@ -1,5 +1,4 @@
-let ir = require("./ir")
-let codes = require("./codes")
+const ir = require("friedrich-mini-split-remote")
 let broadlink = require("./index")
 let temps = require("./temps")
 let home = require("./home")
