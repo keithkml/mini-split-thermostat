@@ -50,40 +50,41 @@ let mousepad = new home.Home(
         temp: {
           ideal: 74,
           min: 66,
-          max: 80
+          max: 80,
         },
-        priority: 0.5
+        priority: 0.5,
       },
       "8am": { priority: 1 },
       "7pm": { priority: 0.5 },
-      "11pm": { priority: 0.1 }
-    }
+      "11pm": { priority: 0.1 },
+    },
   }),
   new home.Room({
     name: "Nursery",
     sensorPrefix: "00:17:88:01:04:b6:89:68-02",
     blasterMacAddress: "9d279200a8c0",
     schedule: {
-      "5am": {
+      "6am": {
         temp: {
           ideal: 73,
           min: 68,
-          max: 78
+          max: 78,
         },
-        priority: 3
+        priority: 1,
       },
       "7am": {
-        turnOffStatusLight: false
+        turnOffStatusLight: false,
       },
       "6pm": {
         temp: {
           ideal: 68,
-          min: 66,
-          max: 74
+          min: 65,
+          max: 74,
         },
-        turnOffStatusLight: true
-      }
-    }
+        priority: 2,
+        turnOffStatusLight: true,
+      },
+    },
   }),
   new home.Room({
     name: "Bedroom",
@@ -95,26 +96,26 @@ let mousepad = new home.Home(
         temp: {
           ideal: 76,
           min: 68,
-          max: 78
+          max: 78,
         },
-        fanSetting: "auto",
+        // fanSetting: "auto",
         turnOffStatusLight: false,
-        priority: 1
+        priority: 1,
       },
       "8pm": {
         temp: {
           ideal: 67,
           min: 62,
-          max: 72
+          max: 72,
         },
-        fanSetting: "high",
+        // fanSetting: "high",
         turnOffStatusLight: true,
-        priority: 2
+        priority: 1,
       },
-      "9pm":  {
-        priority: 0.1,
-      }
-    }
+      // "9pm": {
+        // priority: 0.1,
+      // },
+      },
   }),
   new home.Room({
     name: "Office",
@@ -124,20 +125,20 @@ let mousepad = new home.Home(
     schedule: {
       "8pm": {
         turnOffStatusLight: true,
-        priority: 2,
-        copyModeFromRoomName: "Bedroom"
+        priority: 1,
+        copyModeFromRoomName: "Bedroom",
       },
       "7am": {
         temp: {
-          ideal: 78,
-          min: 67,
-          max: 80
+          ideal: 76,
+          min: 70,
+          max: 80,
         },
         copyModeFromRoomName: null,
         turnOffStatusLight: false,
-        priority: 2
-      }
-    }
+        priority: 1,
+      },
+    },
   })
 )
 
